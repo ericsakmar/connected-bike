@@ -1,13 +1,28 @@
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  background-color: #282c34;
+  color: #abb2bf;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+button {
+  background-color: #61afef;
+  border: none;
+  font-size: 1rem;
+  padding: 0.2em 1em;
+  color: #fff;
+  border-radius: 0.2em;
+  font-weight: 700;
+}
+
+body,
+button,
+text {
+  font-family: "Space Mono", monospace;
+}
+
+.secondary {
+  background-color: #abb2bf;
+}
+
+h1 {
+  color: #c678dd;
 }
