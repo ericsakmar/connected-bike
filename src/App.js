@@ -1,6 +1,6 @@
-import React from "react";
-import { fromEvent } from "rxjs";
-import { map } from "rxjs/operators";
+import React, { useState } from "react";
+import { from, fromEvent } from "rxjs";
+import { map, switchMap, throttleTime } from "rxjs/operators";
 import "./App.css";
 
 const observe = async (serviceId, characteristicId) => {
@@ -29,27 +29,35 @@ const parseBikeData = (value) => {
   return result;
 };
 
-const start = async () => {
-  const data$ = await observe("fitness_machine", "indoor_bike_data");
-
-  const parsedData$ = data$.pipe(
+const watchBikeData = () => {
+  return from(observe("fitness_machine", "indoor_bike_data")).pipe(
+    switchMap((sub) => sub),
     map((e) => e.target.value),
     map((raw) => parseBikeData(raw))
   );
-
-  // to live display
-  parsedData$.subscribe((d) => console.log("one", d));
-
-  // to back end (takewhile and toarray)
-  parsedData$.subscribe((d) => console.log("two", d));
 };
 
 function App() {
+  const [bikeData, setBikeData] = useState();
+
+  const start = () => {
+    const bikeData$ = watchBikeData();
+
+    // to live display
+    bikeData$.pipe(throttleTime(2000)).subscribe(setBikeData);
+
+    // to back end (takewhile and toarray)
+    // bikeData$.subscribe((d) => console.log("two", d));
+  };
+
   return (
     <div className="app">
       <h1>hello world</h1>
-      <button onClick={start}>start</button>
+      <button onClick={start}>connect</button>
+      <button onClick={start}>record</button>
       <button className="secondary">stop</button>
+
+      {bikeData && <div>{JSON.stringify(bikeData)}</div>}
     </div>
   );
 }
