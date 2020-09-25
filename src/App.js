@@ -1,37 +1,38 @@
-import React, { useEffect, useRef, useState } from "react";
-import { takeWhile, toArray } from "rxjs/operators";
+import React, { useRef, useState } from "react";
+import { takeWhile, throttleTime, toArray } from "rxjs/operators";
 import "./App.css";
-import { useBikeData } from "./useBikeData";
+import { connect } from "./bikeDataService";
 
 function App() {
-  const [isRecording, setIsRecording] = useState(false);
-  const { bikeData, connect } = useBikeData();
+  const [bikeData, setBikeData] = useState();
+  const isRecording = useRef(false);
+  const bikeData$ = useRef();
 
-  const record = () => setIsRecording(true);
-  const stop = () => setIsRecording(false);
+  const handleConnect = () => {
+    bikeData$.current = connect();
+    bikeData$.current.pipe(throttleTime(2000)).subscribe(setBikeData);
+  };
 
-  /*
-  useEffect(() => {
-    if (!isRecording) {
-      return;
-    }
+  const handleRecord = () => {
+    isRecording.current = true;
 
     // to the back end
     bikeData$.current
       .pipe(
-        takeWhile(() => isRecording),
+        takeWhile(() => isRecording.current),
         toArray()
       )
       .subscribe((d) => console.log(d));
-  }, [isRecording]);
-  */
+  };
+
+  const handleStop = () => (isRecording.current = false);
 
   return (
     <div className="app">
       <h1>hello world</h1>
-      <button onClick={connect}>connect</button>
-      <button onClick={record}>record</button>
-      <button onClick={stop} className="secondary">
+      <button onClick={handleConnect}>connect</button>
+      <button onClick={handleRecord}>record</button>
+      <button onClick={handleStop} className="secondary">
         stop
       </button>
 
