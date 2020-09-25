@@ -1,8 +1,16 @@
 import React, { useRef, useState } from "react";
-import { takeWhile, throttleTime, toArray } from "rxjs/operators";
+import {
+  map,
+  scan,
+  switchMap,
+  takeWhile,
+  throttleTime,
+  toArray,
+} from "rxjs/operators";
 import { connect } from "./bikeDataService";
 import Dashboard from "./Dashboard";
 import "./App.css";
+import { of, merge, zip } from "rxjs";
 
 function App() {
   const [displayData, setDisplayData] = useState();
@@ -12,6 +20,27 @@ function App() {
   const handleConnect = () => {
     bikeData$.current = connect();
     bikeData$.current.pipe(throttleTime(2000)).subscribe(setDisplayData);
+
+    // averages
+    bikeData$.current
+      .pipe(
+        map((d) => d.heartRate),
+        scan(
+          (acc, cur) => {
+            const count = acc.count + 1;
+            const sum = acc.sum + cur;
+            const average = sum / count;
+            return { count, sum, average };
+          },
+          {
+            count: 0,
+            sum: 0,
+            average: 0,
+          }
+        ),
+        map((d) => d.average)
+      )
+      .subscribe((d) => console.log(d));
   };
 
   const handleRecord = () => {
