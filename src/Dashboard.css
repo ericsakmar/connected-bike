@@ -1,0 +1,16 @@
+.dashboard {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.meter {
+  width: 10rem;
+}
+
+.value {
+  color: #fff;
+  font-size: 3rem;
+}

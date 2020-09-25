@@ -1,16 +1,17 @@
 import React, { useRef, useState } from "react";
 import { takeWhile, throttleTime, toArray } from "rxjs/operators";
-import "./App.css";
 import { connect } from "./bikeDataService";
+import Dashboard from "./Dashboard";
+import "./App.css";
 
 function App() {
-  const [bikeData, setBikeData] = useState();
+  const [displayData, setDisplayData] = useState();
   const isRecording = useRef(false);
   const bikeData$ = useRef();
 
   const handleConnect = () => {
     bikeData$.current = connect();
-    bikeData$.current.pipe(throttleTime(2000)).subscribe(setBikeData);
+    bikeData$.current.pipe(throttleTime(2000)).subscribe(setDisplayData);
   };
 
   const handleRecord = () => {
@@ -36,7 +37,7 @@ function App() {
         stop
       </button>
 
-      {bikeData && <div>{JSON.stringify(bikeData)}</div>}
+      {displayData && <Dashboard data={displayData} />}
     </div>
   );
 }
