@@ -1,10 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
-import { takeWhile, throttleTime, toArray } from "rxjs/operators";
+import {
+  map,
+  mergeMap,
+  switchMap,
+  takeWhile,
+  throttleTime,
+  toArray,
+} from "rxjs/operators";
 import { connect } from "./services/bikeDataService";
 import Dashboard from "./Dashboard";
 import { BluethoothIcon, PlayIcon, StopIcon } from "./Icons";
 import "./App.css";
 import { AccountControls } from "./components/AccountControls";
+import { of, zip } from "rxjs";
+import { nowNs } from "./services/googleFitService";
 
 const DISCONNECTED = "disconnected";
 const CONNECTED = "connected";
@@ -32,6 +41,8 @@ function App() {
     // to the back end
     bikeData$.current
       .pipe(
+        map((d) => ({ ...d, startTimeNanos: nowNs() })),
+        mergeMap((d) => [{ power: d.power }, { heartRate: d.heartRate }]),
         takeWhile(() => isRecording.current),
         toArray()
       )
@@ -43,12 +54,10 @@ function App() {
     isRecording.current = false;
   };
 
-  // stuff do do when we have a user
+  // TODO fetch data when we have a user
   useEffect(() => {
-    console.log(user);
     if (user) {
-      // getDataSources(user.accessToken);
-      // maybe set up data sources?
+      // TODO
     }
   }, [user]);
 
