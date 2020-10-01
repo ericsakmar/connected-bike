@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
-import GoogleLogin from "react-google-login";
-import { getUserCookie, setUserCookie } from "../services/cookieService";
+import GoogleLogin, { GoogleLogout } from "react-google-login";
+import {
+  deleteUserCookie,
+  getUserCookie,
+  setUserCookie,
+} from "../services/cookieService";
 
 const CLIENT_ID =
   "820607331638-nlfao9asjhioq5uvtumes90brq5akpd0.apps.googleusercontent.com";
@@ -24,7 +28,13 @@ export const AccountControls = ({ onUserLoaded }) => {
     });
   };
 
-  const handleLoginFailure = (response) => console.log(response);
+  const handleLogout = () => {
+    onUserLoaded({ haslogin: false, accessToken: "" });
+    deleteUserCookie();
+    setLoggedIn(false);
+  };
+
+  const handleFailure = (response) => console.log(response);
 
   // checks for user info in cookies
   useEffect(() => {
@@ -39,7 +49,14 @@ export const AccountControls = ({ onUserLoaded }) => {
   }, [onUserLoaded]);
 
   if (loggedIn) {
-    return <div> LOG OUT</div>;
+    return (
+      <GoogleLogout
+        clientId={CLIENT_ID}
+        buttonText="Logout"
+        onLogoutSuccess={handleLogout}
+        onFailure={handleFailure}
+      />
+    );
   }
 
   return (
@@ -47,7 +64,7 @@ export const AccountControls = ({ onUserLoaded }) => {
       clientId={CLIENT_ID}
       buttonText="Login"
       onSuccess={handleLogin}
-      onFailure={handleLoginFailure}
+      onFailure={handleFailure}
       cookiePolicy="single_host_origin"
       responseType="code,token"
       scope="https://www.googleapis.com/auth/fitness.activity.read https://www.googleapis.com/auth/fitness.activity.write"

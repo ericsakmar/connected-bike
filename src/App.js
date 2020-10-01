@@ -76,7 +76,9 @@ function App() {
 
       {displayData && <Dashboard data={displayData} />}
 
-      <AccountControls onUserLoaded={setUser} />
+      <div className="account-controls">
+        <AccountControls onUserLoaded={setUser} />
+      </div>
     </div>
   );
 }
