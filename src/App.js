@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
+  groupBy,
   map,
   mergeMap,
+  scan,
   switchMap,
   takeWhile,
   throttleTime,
@@ -41,9 +43,37 @@ function App() {
     // to the back end
     bikeData$.current
       .pipe(
+        // adds startTime
         map((d) => ({ ...d, startTimeNanos: nowNs() })),
-        mergeMap((d) => [{ power: d.power }, { heartRate: d.heartRate }]),
+
+        // to points
+        mergeMap((d) => [
+          // https://developers.google.com/fit/datatypes/activity#power
+          {
+            dataTypeName: "com.google.power.sample",
+            startTimeNanos: d.startTimeNanos,
+            value: [{ fpVal: d.power }],
+          },
+
+          // https://developers.google.com/fit/datatypes/body#heart_rate
+          {
+            dataTypeName: "com.google.heart_rate.bpm",
+            startTimeNanos: d.startTimeNanos,
+            value: [{ intVal: d.heartRate }],
+          },
+
+          // https://developers.google.com/fit/datatypes/activity#cycling_pedaling_cadence
+          {
+            dataTypeName: "com.google.cycling.pedaling.cadence",
+            startTimeNanos: d.startTimeNanos,
+            value: [{ fpVal: d.power }],
+          },
+        ]),
+
+        // stop
         takeWhile(() => isRecording.current),
+        // groupBy((d) => d.dataTypeName),
+        // switchMap((d) => d.pipe(toArray())),
         toArray()
       )
       .subscribe((d) => console.log(d));
