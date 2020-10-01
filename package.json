@@ -8,8 +8,10 @@
     "@testing-library/user-event": "^7.1.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-google-login": "^5.1.21",
     "react-scripts": "3.4.3",
-    "rxjs": "^6.6.3"
+    "rxjs": "^6.6.3",
+    "universal-cookie": "^4.0.4"
   },
   "scripts": {
     "start": "react-scripts start",
