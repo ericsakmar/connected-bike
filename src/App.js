@@ -13,6 +13,7 @@ const STOPPED = "stopped";
 function App() {
   const [activityState, setActivityState] = useState(DISCONNECTED);
   const [displayData, setDisplayData] = useState();
+  // TODO find a way to not duplicate this flag
   const isRecording = useRef(false);
   const bikeData$ = useRef();
 
