@@ -1,28 +1,47 @@
+:root {
+  --black: #282c34;
+  --red: #e06c75;
+  --green: #98c379;
+  --yellow: #e5c07b;
+  --blue: #61afef;
+  --purple: #c678dd;
+  --bluegreen: #56b6c2;
+  --gray: #abb2bf;
+  --white: #fff;
+}
+
 body {
-  background-color: #282c34;
-  color: #abb2bf;
+  background-color: var(--white);
+  color: var(--black);
 }
 
 button {
-  background-color: #61afef;
+  background-color: var(--black);
   border: none;
-  font-size: 1rem;
-  padding: 0.2em 1em;
-  color: #fff;
-  border-radius: 0.2em;
+  padding: 2rem;
+  color: var(--white);
+  border-radius: 0.1rem;
   font-weight: 700;
+  margin: 1rem;
+  box-shadow: 0.5rem 0.5rem 0px 0px var(--blue);
+  transition: box-shadow 200ms ease-in-out;
+}
+
+button:hover {
+  box-shadow: 0.5rem 0.5rem 0px 0px var(--bluegreen);
+}
+
+button:active {
+  box-shadow: 0.5rem 0.5rem 0px 0px var(--purple);
+}
+
+button > svg {
+  width: 2rem;
+  height: 2rem;
 }
 
 body,
 button,
 text {
   font-family: "Space Mono", monospace;
-}
-
-.secondary {
-  background-color: #abb2bf;
-}
-
-h1 {
-  color: #c678dd;
 }

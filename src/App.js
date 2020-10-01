@@ -11,6 +11,7 @@ import { connect } from "./bikeDataService";
 import Dashboard from "./Dashboard";
 import "./App.css";
 import { of, merge, zip } from "rxjs";
+import { BluethoothIcon, PlayIcon, StopIcon } from "./Icons";
 
 function App() {
   const [displayData, setDisplayData] = useState();
@@ -59,11 +60,18 @@ function App() {
 
   return (
     <div className="app">
-      <h1>hello world</h1>
-      <button onClick={handleConnect}>connect</button>
-      <button onClick={handleRecord}>record</button>
-      <button onClick={handleStop} className="secondary">
-        stop
+      <h1>connected bike</h1>
+
+      <button onClick={handleConnect}>
+        <BluethoothIcon />
+      </button>
+
+      <button onClick={handleRecord}>
+        <PlayIcon />
+      </button>
+
+      <button onClick={handleStop}>
+        <StopIcon />
       </button>
 
       {displayData && <Dashboard data={displayData} />}
