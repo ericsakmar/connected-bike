@@ -28,6 +28,7 @@ function App() {
   // TODO find a way to not duplicate this flag
   const isRecording = useRef(false);
   const bikeData$ = useRef();
+  const [message, setMessage] = useState();
 
   const handleConnect = () => {
     bikeData$.current = connect();
@@ -114,7 +115,11 @@ function App() {
         })
       )
       .subscribe(([powerDs, heartRateDs, cadenceDs]) => {
+        // TODO only upload if logged in? save local otherwise?
+
+        setMessage("Uploading...");
         uploadDataSet(user.accessToken);
+        setMessage("Upload complete!");
       });
   };
 
@@ -133,6 +138,7 @@ function App() {
   return (
     <div className="app">
       <h1>connected bike</h1>
+      {message && <div>{message}</div>}
 
       {activityState === DISCONNECTED && (
         <button onClick={handleConnect}>

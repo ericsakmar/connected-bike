@@ -56,18 +56,11 @@ export const getDataSource = async (name) => {
   );
 
   if (dataSource) {
-    console.log("exists");
     return dataSource;
   }
 
   // it doesn't exist, so add it
-  console.log("creating");
   return await createDataSource(POWER_DATA_SOURCE);
-};
-
-export const uploadDataSet = async (dataSet) => {
-  const dataSource = await getDataSource(POWER_DATA_SOURCE.dataStreamName);
-  console.log(dataSource);
 };
 
 export const createDataSource = async (dataSource) => {
@@ -81,6 +74,19 @@ export const createDataSource = async (dataSource) => {
   );
 
   const json = await res.json();
-  console.log(json);
   return json;
+};
+
+export const uploadDataSet = async (dataSet) => {
+  const dataSource = await getDataSource(POWER_DATA_SOURCE.dataStreamName);
+  const dataSetWithId = { ...dataSet, dataSourceId: dataSource.dataSourceId };
+  const url = `https://www.googleapis.com/fitness/v1/users/me/dataSources/${dataSource.dataSourceId}/datasets/${dataSource.minStartTimeNs}-${dataSource.maxEndTimeNs}`;
+
+  const res = await fetch(url, {
+    method: "PATCH",
+    headers: buildHeaders(),
+    body: JSON.stringify(dataSetWithId),
+  });
+
+  return res.ok;
 };
