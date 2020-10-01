@@ -3,6 +3,7 @@ import {
   groupBy,
   map,
   mergeMap,
+  pairwise,
   scan,
   switchMap,
   takeWhile,
@@ -46,12 +47,19 @@ function App() {
         // adds startTime
         map((d) => ({ ...d, startTimeNanos: nowNs() })),
 
-        // to points
+        pairwise(),
+
+        map(([p, c]) => {
+          const timeDiff = c.startTimeNanos - p.startTimeNanos;
+          return { ...p, endTimeNanos: p.startTimeNanos + timeDiff };
+        }),
+
         mergeMap((d) => [
           // https://developers.google.com/fit/datatypes/activity#power
           {
             dataTypeName: "com.google.power.sample",
             startTimeNanos: d.startTimeNanos,
+            endTimeNanos: d.endTimeNanos,
             value: [{ fpVal: d.power }],
           },
 
@@ -59,6 +67,7 @@ function App() {
           {
             dataTypeName: "com.google.heart_rate.bpm",
             startTimeNanos: d.startTimeNanos,
+            endTimeNanos: d.endTimeNanos,
             value: [{ intVal: d.heartRate }],
           },
 
@@ -66,14 +75,14 @@ function App() {
           {
             dataTypeName: "com.google.cycling.pedaling.cadence",
             startTimeNanos: d.startTimeNanos,
+            endTimeNanos: d.endTimeNanos,
             value: [{ fpVal: d.power }],
           },
         ]),
 
-        // stop
         takeWhile(() => isRecording.current),
-        // groupBy((d) => d.dataTypeName),
-        // switchMap((d) => d.pipe(toArray())),
+        groupBy((d) => d.dataTypeName),
+        mergeMap((d) => d.pipe(toArray())),
         toArray()
       )
       .subscribe((d) => console.log(d));
