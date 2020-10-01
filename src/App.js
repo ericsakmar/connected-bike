@@ -1,50 +1,29 @@
 import React, { useRef, useState } from "react";
-import {
-  map,
-  scan,
-  switchMap,
-  takeWhile,
-  throttleTime,
-  toArray,
-} from "rxjs/operators";
+import { takeWhile, throttleTime, toArray } from "rxjs/operators";
 import { connect } from "./bikeDataService";
 import Dashboard from "./Dashboard";
-import "./App.css";
-import { of, merge, zip } from "rxjs";
 import { BluethoothIcon, PlayIcon, StopIcon } from "./Icons";
+import "./App.css";
+
+const DISCONNECTED = "disconnected";
+const CONNECTED = "connected";
+const RECORDING = "recording";
+const STOPPED = "stopped";
 
 function App() {
+  const [activityState, setActivityState] = useState(DISCONNECTED);
   const [displayData, setDisplayData] = useState();
   const isRecording = useRef(false);
   const bikeData$ = useRef();
 
   const handleConnect = () => {
     bikeData$.current = connect();
+    setActivityState(CONNECTED);
     bikeData$.current.pipe(throttleTime(2000)).subscribe(setDisplayData);
-
-    // averages
-    bikeData$.current
-      .pipe(
-        map((d) => d.heartRate),
-        scan(
-          (acc, cur) => {
-            const count = acc.count + 1;
-            const sum = acc.sum + cur;
-            const average = sum / count;
-            return { count, sum, average };
-          },
-          {
-            count: 0,
-            sum: 0,
-            average: 0,
-          }
-        ),
-        map((d) => d.average)
-      )
-      .subscribe((d) => console.log(d));
   };
 
   const handleRecord = () => {
+    setActivityState(RECORDING);
     isRecording.current = true;
 
     // to the back end
@@ -56,23 +35,32 @@ function App() {
       .subscribe((d) => console.log(d));
   };
 
-  const handleStop = () => (isRecording.current = false);
+  const handleStop = () => {
+    setActivityState(STOPPED);
+    isRecording.current = false;
+  };
 
   return (
     <div className="app">
       <h1>connected bike</h1>
 
-      <button onClick={handleConnect}>
-        <BluethoothIcon />
-      </button>
+      {activityState === DISCONNECTED && (
+        <button onClick={handleConnect}>
+          <BluethoothIcon />
+        </button>
+      )}
 
-      <button onClick={handleRecord}>
-        <PlayIcon />
-      </button>
+      {(activityState === CONNECTED || activityState === STOPPED) && (
+        <button onClick={handleRecord}>
+          <PlayIcon />
+        </button>
+      )}
 
-      <button onClick={handleStop}>
-        <StopIcon />
-      </button>
+      {activityState === RECORDING && (
+        <button onClick={handleStop}>
+          <StopIcon />
+        </button>
+      )}
 
       {displayData && <Dashboard data={displayData} />}
     </div>
