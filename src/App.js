@@ -14,7 +14,7 @@ import { BluethoothIcon, PlayIcon, StopIcon } from "./Icons";
 import "./App.css";
 import { AccountControls } from "./components/AccountControls";
 import { of, zip } from "rxjs";
-import { nowNs } from "./services/googleFitService";
+import { nowNs, uploadDataSet } from "./services/googleFitService";
 
 const DISCONNECTED = "disconnected";
 const CONNECTED = "connected";
@@ -84,6 +84,7 @@ function App() {
         groupBy((d) => d.dataTypeName),
         mergeMap((d) => d.pipe(toArray())),
         toArray(),
+
         map(([powerPoints, heartRatePoints, cadencePoints]) => {
           const minStartTimeNs = powerPoints[0].startTimeNanos;
           const maxEndTimeNs = powerPoints[powerPoints.length - 1].endTimeNanos;
@@ -112,7 +113,9 @@ function App() {
           ];
         })
       )
-      .subscribe((d) => console.log(d));
+      .subscribe(([powerDs, heartRateDs, cadenceDs]) => {
+        uploadDataSet(user.accessToken);
+      });
   };
 
   const handleStop = () => {
