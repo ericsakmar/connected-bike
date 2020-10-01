@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { takeWhile, throttleTime, toArray } from "rxjs/operators";
-import { connect } from "./bikeDataService";
+import { connect } from "./services/bikeDataService";
 import Dashboard from "./Dashboard";
 import { BluethoothIcon, PlayIcon, StopIcon } from "./Icons";
 import "./App.css";
 import GoogleLogin from "react-google-login";
-import { getUserCookie, setUserCookie } from "./cookieService";
+import { getUserCookie, setUserCookie } from "./services/cookieService";
+import { getDataSources } from "./services/googleFitService";
 
 const DISCONNECTED = "disconnected";
 const CONNECTED = "connected";
@@ -64,6 +65,7 @@ function App() {
 
   const handleLoginFailure = (response) => console.log(response);
 
+  // checks for user info in cookies
   useEffect(() => {
     const userCookie = getUserCookie();
 
@@ -73,6 +75,14 @@ function App() {
       });
     }
   }, []);
+
+  // stuff do do when we have a user
+  useEffect(() => {
+    if (user) {
+      // getDataSources(user.accessToken);
+      // maybe set up data sources?
+    }
+  }, [user]);
 
   const loggedIn = user && user.haslogin;
 
