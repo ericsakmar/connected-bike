@@ -28,21 +28,24 @@ const parseBikeData = (value) => {
 };
 
 export const connect = () => {
-  // return from(observe("fitness_machine", "indoor_bike_data")).pipe(
-  //   switchMap((sub) => sub),
-  //   map((e) => e.target.value),
-  //   map((raw) => parseBikeData(raw))
-  // );
+  // random data for debugging
+  if (false) {
+    const rnd = (max) => Math.floor(Math.random() * Math.floor(max));
+    return new Observable((subject) => {
+      setInterval(() => {
+        subject.next({
+          speed: rnd(20),
+          cadence: rnd(100),
+          power: rnd(400),
+          heartRate: rnd(180),
+        });
+      }, 200);
+    });
+  }
 
-  const rnd = (max) => Math.floor(Math.random() * Math.floor(max));
-  return new Observable((subject) => {
-    setInterval(() => {
-      subject.next({
-        speed: rnd(20),
-        cadence: rnd(100),
-        power: rnd(400),
-        heartRate: rnd(180),
-      });
-    }, 200);
-  });
+  return from(observe("fitness_machine", "indoor_bike_data")).pipe(
+    switchMap((sub) => sub),
+    map((e) => e.target.value),
+    map((raw) => parseBikeData(raw))
+  );
 };
