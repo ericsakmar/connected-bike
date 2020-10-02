@@ -14,7 +14,7 @@ export const toDataSetPoint = (d) => [
     originDataSourceId: "", // ???
     startTimeNanos: d.startTimeNanos,
     endTimeNanos: d.endTimeNanos,
-    value: [{ intVal: d.heartRate }],
+    value: [{ fpVal: d.heartRate }],
   },
 
   // https://developers.google.com/fit/datatypes/activity#cycling_pedaling_cadence
