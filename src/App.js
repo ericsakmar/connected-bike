@@ -118,7 +118,7 @@ function App() {
         // TODO only upload if logged in? save local otherwise?
 
         setMessage("Uploading...");
-        uploadDataSet(user.accessToken);
+        uploadDataSet(powerDs);
         setMessage("Upload complete!");
       });
   };

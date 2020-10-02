@@ -43,24 +43,30 @@ export const getDataSources = async () => {
   );
 
   const json = await res.json();
-  console.log(json);
-
   return json.dataSource;
 };
 
 export const getDataSource = async (name) => {
-  // check if it already exists
+  // check local cache
+  const localDataSource = localStorage.getItem(name);
+  if (localDataSource) {
+    return JSON.parse(localDataSource);
+  }
+
+  // check if it already exists online
   const dataSources = await getDataSources();
-  const dataSource = dataSources.find(
+  const remoteDataSource = dataSources.find(
     (d) => d.dataStreamName === POWER_DATA_SOURCE.dataStreamName
   );
-
-  if (dataSource) {
-    return dataSource;
+  if (remoteDataSource) {
+    localStorage.setItem(name, JSON.stringify(remoteDataSource));
+    return remoteDataSource;
   }
 
   // it doesn't exist, so add it
-  return await createDataSource(POWER_DATA_SOURCE);
+  const newDataSource = await createDataSource(POWER_DATA_SOURCE);
+  localStorage.setItem(name, JSON.stringify(remoteDataSource));
+  return newDataSource;
 };
 
 export const createDataSource = async (dataSource) => {
@@ -79,8 +85,8 @@ export const createDataSource = async (dataSource) => {
 
 export const uploadDataSet = async (dataSet) => {
   const dataSource = await getDataSource(POWER_DATA_SOURCE.dataStreamName);
-  const dataSetWithId = { ...dataSet, dataSourceId: dataSource.dataSourceId };
-  const url = `https://www.googleapis.com/fitness/v1/users/me/dataSources/${dataSource.dataSourceId}/datasets/${dataSource.minStartTimeNs}-${dataSource.maxEndTimeNs}`;
+  const dataSetWithId = { ...dataSet, dataSourceId: dataSource.dataStreamId };
+  const url = `https://www.googleapis.com/fitness/v1/users/me/dataSources/${dataSource.dataStreamId}/datasets/${dataSetWithId.minStartTimeNs}-${dataSetWithId.maxEndTimeNs}`;
 
   const res = await fetch(url, {
     method: "PATCH",
