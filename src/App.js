@@ -42,6 +42,7 @@ function App() {
     // to the back end
     bikeData$.current
       .pipe(
+        throttleTime(5000),
         map((d) => ({ ...d, startTimeNanos: nowNs() })),
 
         pairwise(),
@@ -117,7 +118,7 @@ function App() {
         // TODO only upload if logged in? save local otherwise?
 
         setMessage("Uploading...");
-        uploadSession(powerDs);
+        uploadSession(powerDs, heartRateDs, cadenceDs);
         setMessage("Upload complete!");
       });
   };

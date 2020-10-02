@@ -9,6 +9,13 @@ import {
 const CLIENT_ID =
   "820607331638-nlfao9asjhioq5uvtumes90brq5akpd0.apps.googleusercontent.com";
 
+const SCOPE = [
+  "https://www.googleapis.com/auth/fitness.activity.read",
+  "https://www.googleapis.com/auth/fitness.activity.write",
+  "https://www.googleapis.com/auth/fitness.body.read",
+  "https://www.googleapis.com/auth/fitness.body.write",
+].join(" ");
+
 export const AccountControls = ({ onUserLoaded }) => {
   const [loggedIn, setLoggedIn] = useState(false);
 
@@ -67,7 +74,7 @@ export const AccountControls = ({ onUserLoaded }) => {
       onFailure={handleFailure}
       cookiePolicy="single_host_origin"
       responseType="code,token"
-      scope="https://www.googleapis.com/auth/fitness.activity.read https://www.googleapis.com/auth/fitness.activity.write"
+      scope={SCOPE}
     />
   );
 };

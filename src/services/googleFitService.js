@@ -8,20 +8,36 @@ const APPLICATION = {
   version: "1",
 };
 
+const DEVICE = {
+  manufacturer: "Eric Sakmar",
+  model: "Web App",
+  type: "unknown",
+  uid: "2112",
+  version: "1.0",
+};
+
 const POWER_DATA_SOURCE = {
   dataStreamName: "Connected Bike - Power",
   type: "raw",
   application: APPLICATION,
-  dataType: {
-    name: "com.google.power.sample",
-  },
-  device: {
-    manufacturer: "Eric Sakmar",
-    model: "Web App",
-    type: "unknown",
-    uid: "2112",
-    version: "1.0",
-  },
+  dataType: { name: "com.google.power.sample" },
+  device: DEVICE,
+};
+
+const HEART_RATE_DATA_SOURCE = {
+  dataStreamName: "Connected Bike - Heart Rate",
+  type: "raw",
+  application: APPLICATION,
+  dataType: { name: "com.google.heart_rate.bpm" },
+  device: DEVICE,
+};
+
+const CADENCE_DATA_SOURCE = {
+  dataStreamName: "Connected Bike - Cadence",
+  type: "raw",
+  application: APPLICATION,
+  dataType: { name: "com.google.cycling.pedaling.cadence" },
+  device: DEVICE,
 };
 
 const buildHeaders = () => {
@@ -99,8 +115,10 @@ export const uploadDataSet = async (baseDataSource, dataSet) => {
   return res.ok;
 };
 
-export const uploadSession = async (powerData) => {
+export const uploadSession = async (powerData, heartRateData, cadenceData) => {
   await uploadDataSet(POWER_DATA_SOURCE, powerData);
+  await uploadDataSet(HEART_RATE_DATA_SOURCE, heartRateData);
+  await uploadDataSet(CADENCE_DATA_SOURCE, cadenceData);
 
   const startTimeMillis = Math.round(powerData.minStartTimeNs / 1000000);
   const endTimeMillis = Math.round(powerData.maxEndTimeNs / 1000000);
