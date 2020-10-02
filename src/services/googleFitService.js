@@ -1,15 +1,17 @@
-// https://www.googleapis.com/fitness/v1/users/me/sessions?startTime=2020-09-01T00:00:00.000Z&endTime=2020-09-30T23:59:59.999Z
+// https://www.googleapis.com/fitness/v1/users/me/sessions?startTime=2020-10-01T00:00:00.000Z&endTime=2020-10-30T23:59:59.999Z
 
 import { getUserCookie } from "./cookieService";
+
+const APPLICATION = {
+  detailsUrl: "https://github.com/ericsakmar/connected-bike",
+  name: "Connected Bike",
+  version: "1",
+};
 
 const POWER_DATA_SOURCE = {
   dataStreamName: "Connected Bike - Power",
   type: "raw",
-  application: {
-    detailsUrl: "https://github.com/ericsakmar/connected-bike",
-    name: "Connected Bike",
-    version: "1",
-  },
+  application: APPLICATION,
   dataType: {
     name: "com.google.power.sample",
   },
@@ -46,7 +48,9 @@ export const getDataSources = async () => {
   return json.dataSource;
 };
 
-export const getDataSource = async (name) => {
+export const getDataSource = async (baseDataSource) => {
+  const name = baseDataSource.dataStreamName;
+
   // check local cache
   const localDataSource = localStorage.getItem(name);
   if (localDataSource) {
@@ -55,16 +59,14 @@ export const getDataSource = async (name) => {
 
   // check if it already exists online
   const dataSources = await getDataSources();
-  const remoteDataSource = dataSources.find(
-    (d) => d.dataStreamName === POWER_DATA_SOURCE.dataStreamName
-  );
+  const remoteDataSource = dataSources.find((d) => d.dataStreamName === name);
   if (remoteDataSource) {
     localStorage.setItem(name, JSON.stringify(remoteDataSource));
     return remoteDataSource;
   }
 
   // it doesn't exist, so add it
-  const newDataSource = await createDataSource(POWER_DATA_SOURCE);
+  const newDataSource = await createDataSource(baseDataSource);
   localStorage.setItem(name, JSON.stringify(remoteDataSource));
   return newDataSource;
 };
@@ -83,8 +85,8 @@ export const createDataSource = async (dataSource) => {
   return json;
 };
 
-export const uploadDataSet = async (dataSet) => {
-  const dataSource = await getDataSource(POWER_DATA_SOURCE.dataStreamName);
+export const uploadDataSet = async (baseDataSource, dataSet) => {
+  const dataSource = await getDataSource(baseDataSource);
   const dataSetWithId = { ...dataSet, dataSourceId: dataSource.dataStreamId };
   const url = `https://www.googleapis.com/fitness/v1/users/me/dataSources/${dataSource.dataStreamId}/datasets/${dataSetWithId.minStartTimeNs}-${dataSetWithId.maxEndTimeNs}`;
 
@@ -92,6 +94,34 @@ export const uploadDataSet = async (dataSet) => {
     method: "PATCH",
     headers: buildHeaders(),
     body: JSON.stringify(dataSetWithId),
+  });
+
+  return res.ok;
+};
+
+export const uploadSession = async (powerData) => {
+  await uploadDataSet(POWER_DATA_SOURCE, powerData);
+
+  const startTimeMillis = Math.round(powerData.minStartTimeNs / 1000000);
+  const endTimeMillis = Math.round(powerData.maxEndTimeNs / 1000000);
+  const id = `${startTimeMillis}-${endTimeMillis}`;
+
+  const session = {
+    id,
+    startTimeMillis,
+    endTimeMillis,
+    name: "Connected Bike Ride",
+    description: "Connected Bike Ride",
+    application: APPLICATION,
+    activityType: 17, // spinning
+  };
+
+  const url = `https://www.googleapis.com/fitness/v1/users/me/sessions/${id}`;
+
+  const res = await fetch(url, {
+    method: "PUT",
+    headers: buildHeaders(),
+    body: JSON.stringify(session),
   });
 
   return res.ok;

@@ -13,8 +13,7 @@ import Dashboard from "./Dashboard";
 import { BluethoothIcon, PlayIcon, StopIcon } from "./Icons";
 import "./App.css";
 import { AccountControls } from "./components/AccountControls";
-import { of, zip } from "rxjs";
-import { nowNs, uploadDataSet } from "./services/googleFitService";
+import { nowNs, uploadSession } from "./services/googleFitService";
 
 const DISCONNECTED = "disconnected";
 const CONNECTED = "connected";
@@ -118,7 +117,7 @@ function App() {
         // TODO only upload if logged in? save local otherwise?
 
         setMessage("Uploading...");
-        uploadDataSet(powerDs);
+        uploadSession(powerDs);
         setMessage("Upload complete!");
       });
   };
