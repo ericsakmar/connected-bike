@@ -14,6 +14,7 @@ import { BluethoothIcon, PlayIcon, StopIcon } from "./Icons";
 import "./App.css";
 import { AccountControls } from "./components/AccountControls";
 import { nowNs, uploadSession } from "./services/googleFitService";
+import { toDataSetPoint, toDataSource } from "./services/dataTransforms";
 
 const DISCONNECTED = "disconnected";
 const CONNECTED = "connected";
@@ -44,79 +45,20 @@ function App() {
       .pipe(
         throttleTime(5000),
         map((d) => ({ ...d, startTimeNanos: nowNs() })),
-
         pairwise(),
-
         map(([p, c]) => {
           const timeDiff = c.startTimeNanos - p.startTimeNanos;
           return { ...p, endTimeNanos: p.startTimeNanos + timeDiff };
         }),
-
-        mergeMap((d) => [
-          // https://developers.google.com/fit/datatypes/activity#power
-          {
-            dataTypeName: "com.google.power.sample",
-            originDataSourceId: "", // ???
-            startTimeNanos: d.startTimeNanos,
-            endTimeNanos: d.endTimeNanos,
-            value: [{ fpVal: d.power }],
-          },
-
-          // https://developers.google.com/fit/datatypes/body#heart_rate
-          {
-            dataTypeName: "com.google.heart_rate.bpm",
-            originDataSourceId: "", // ???
-            startTimeNanos: d.startTimeNanos,
-            endTimeNanos: d.endTimeNanos,
-            value: [{ intVal: d.heartRate }],
-          },
-
-          // https://developers.google.com/fit/datatypes/activity#cycling_pedaling_cadence
-          {
-            dataTypeName: "com.google.cycling.pedaling.cadence",
-            originDataSourceId: "", // ???
-            startTimeNanos: d.startTimeNanos,
-            endTimeNanos: d.endTimeNanos,
-            value: [{ fpVal: d.power }],
-          },
-        ]),
-
+        mergeMap((d) => toDataSetPoint(d)),
         takeWhile(() => isRecording.current),
         groupBy((d) => d.dataTypeName),
         mergeMap((d) => d.pipe(toArray())),
         toArray(),
-
-        map(([powerPoints, heartRatePoints, cadencePoints]) => {
-          const minStartTimeNs = powerPoints[0].startTimeNanos;
-          const maxEndTimeNs = powerPoints[powerPoints.length - 1].endTimeNanos;
-
-          return [
-            {
-              dataSourceId: "TODO",
-              maxEndTimeNs,
-              minStartTimeNs,
-              point: powerPoints,
-            },
-
-            {
-              dataSourceId: "TODO",
-              maxEndTimeNs,
-              minStartTimeNs,
-              point: heartRatePoints,
-            },
-
-            {
-              dataSourceId: "TODO",
-              maxEndTimeNs,
-              minStartTimeNs,
-              point: cadencePoints,
-            },
-          ];
-        })
+        map((points) => toDataSource(points))
       )
       .subscribe(([powerDs, heartRateDs, cadenceDs]) => {
         // TODO only upload if logged in? save local otherwise?
-
         setMessage("Uploading...");
         uploadSession(powerDs, heartRateDs, cadenceDs);
         setMessage("Upload complete!");
