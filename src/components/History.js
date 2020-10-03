@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toDisplay } from "../services/dataTransforms";
 import { getHistory } from "../services/googleFitService";
 import "./History.css";
