@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { toDisplay } from "../services/dataTransforms";
 import { getHistory } from "../services/googleFitService";
+import "./History.css";
 
 export const History = ({ user }) => {
   const [message, setMessage] = useState();
@@ -25,7 +26,7 @@ export const History = ({ user }) => {
   }
 
   return (
-    <div>
+    <div className="history">
       {message && <div>{message}</div>}
       {history && <HistoryTable history={history} />}
     </div>
@@ -40,14 +41,14 @@ export const HistoryTable = ({ history }) => {
   }
 
   return (
-    <table>
+    <table className="history-table">
       <thead>
         <tr>
           <th>Start</th>
-          <th>Length</th>
-          <th>Power</th>
-          <th>Heart Rate</th>
-          <th>Cadence</th>
+          <th className="number">Length</th>
+          <th className="number">Power</th>
+          <th className="number">Heart Rate</th>
+          <th className="number">Cadence</th>
         </tr>
       </thead>
 
@@ -55,10 +56,10 @@ export const HistoryTable = ({ history }) => {
         {history.map((d) => (
           <tr key={d.startTime}>
             <td>{d.startTime}</td>
-            <td>{d.length}</td>
-            <td>{d.averagePower}</td>
-            <td>{d.averageHeartRate}</td>
-            <td>{d.averageCadence}</td>
+            <td className="number">{d.length}</td>
+            <td className="number">{d.averagePower}</td>
+            <td className="number">{d.averageHeartRate}</td>
+            <td className="number">{d.averageCadence}</td>
           </tr>
         ))}
       </tbody>
