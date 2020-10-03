@@ -167,14 +167,16 @@ export const getHistory = async () => {
     (s) => s.application.name === APPLICATION.name
   );
 
-  // temp
-  const session = sessions[1];
+  const data = Promise.all(sessions.map((session) => getDataSets(session)));
+  return data;
+};
 
+export const getDataSets = async (session) => {
   const power = await getDataSet(POWER_DATA_SOURCE, session);
   const heartRate = await getDataSet(HEART_RATE_DATA_SOURCE, session);
   const cadence = await getDataSet(CADENCE_DATA_SOURCE, session);
 
-  return [power, heartRate, cadence];
+  return { session, dataSets: { power, heartRate, cadence } };
 };
 
 export const getDataSet = async (baseDataSource, session) => {
