@@ -1,0 +1,21 @@
+.history {
+  margin-top: 5rem;
+}
+
+.history-table {
+  margin: 0 auto;
+}
+
+.history-table th {
+  text-align: left;
+  border-bottom: 1px solid var(--gray);
+}
+
+.history-table .number {
+  text-align: right;
+}
+
+.history-table th:not(:last-child),
+.history-table td:not(:last-child) {
+  padding-right: 1rem;
+}
