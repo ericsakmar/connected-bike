@@ -13,7 +13,7 @@ import Dashboard from "./Dashboard";
 import { BluethoothIcon, PlayIcon, StopIcon } from "./Icons";
 import "./App.css";
 import { AccountControls } from "./components/AccountControls";
-import { nowNs, uploadSession } from "./services/googleFitService";
+import { getHistory, nowNs, uploadSession } from "./services/googleFitService";
 import { toDataSetPoint, toDataSource } from "./services/dataTransforms";
 
 const DISCONNECTED = "disconnected";
@@ -73,7 +73,7 @@ function App() {
   // TODO fetch data when we have a user
   useEffect(() => {
     if (user) {
-      // TODO
+      getHistory();
     }
   }, [user]);
 

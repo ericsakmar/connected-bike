@@ -1,6 +1,7 @@
 // https://www.googleapis.com/fitness/v1/users/me/sessions?startTime=2020-10-01T00:00:00.000Z&endTime=2020-10-30T23:59:59.999Z
 
 import { getUserCookie } from "./cookieService";
+import subDays from "date-fns/subDays";
 
 const APPLICATION = {
   detailsUrl: "https://github.com/ericsakmar/connected-bike",
@@ -143,4 +144,50 @@ export const uploadSession = async (powerData, heartRateData, cadenceData) => {
   });
 
   return res.ok;
+};
+
+export const getSessions = async () => {
+  const endTime = new Date();
+  const startTime = subDays(endTime, 7);
+  const url = `https://www.googleapis.com/fitness/v1/users/me/sessions?startTime=${startTime.toISOString()}&endTime=${endTime.toISOString()}`;
+
+  const res = await fetch(url, {
+    method: "GET",
+    headers: buildHeaders(),
+  });
+
+  const json = await res.json();
+  return json.session;
+};
+
+export const getHistory = async () => {
+  const allSessions = await getSessions();
+
+  const sessions = allSessions.filter(
+    (s) => s.application.name === APPLICATION.name
+  );
+
+  // temp
+  const session = sessions[1];
+
+  // power
+  const powerSource = await getDataSource(POWER_DATA_SOURCE);
+  const powerDataSet = await getDataSet(
+    powerSource,
+    session.startTimeMillis * 1000000,
+    session.endTimeMillis * 1000000
+  );
+  console.log(powerDataSet);
+};
+
+export const getDataSet = async (dataSource, startNs, endNs) => {
+  const url = `https://www.googleapis.com/fitness/v1/users/me/dataSources/${dataSource.dataStreamId}/datasets/${startNs}-${endNs}`;
+
+  const res = await fetch(url, {
+    method: "GET",
+    headers: buildHeaders(),
+  });
+
+  const json = await res.json();
+  return json;
 };
