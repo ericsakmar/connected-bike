@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   groupBy,
   map,
@@ -13,8 +13,9 @@ import Dashboard from "./Dashboard";
 import { BluethoothIcon, PlayIcon, StopIcon } from "./Icons";
 import "./App.css";
 import { AccountControls } from "./components/AccountControls";
-import { getHistory, nowNs, uploadSession } from "./services/googleFitService";
+import { nowNs, uploadSession } from "./services/googleFitService";
 import { toDataSetPoint, toDataSource } from "./services/dataTransforms";
+import { History } from "./components/History";
 
 const DISCONNECTED = "disconnected";
 const CONNECTED = "connected";
@@ -70,13 +71,6 @@ function App() {
     isRecording.current = false;
   };
 
-  // TODO fetch data when we have a user
-  useEffect(() => {
-    if (user) {
-      getHistory();
-    }
-  }, [user]);
-
   return (
     <div className="app">
       <h1>connected bike</h1>
@@ -101,6 +95,8 @@ function App() {
       )}
 
       {displayData && <Dashboard data={displayData} />}
+
+      <History user={user} />
 
       <div className="account-controls">
         <AccountControls onUserLoaded={setUser} />

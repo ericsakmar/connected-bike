@@ -170,17 +170,18 @@ export const getHistory = async () => {
   // temp
   const session = sessions[1];
 
-  // power
-  const powerSource = await getDataSource(POWER_DATA_SOURCE);
-  const powerDataSet = await getDataSet(
-    powerSource,
-    session.startTimeMillis * 1000000,
-    session.endTimeMillis * 1000000
-  );
-  console.log(powerDataSet);
+  const power = await getDataSet(POWER_DATA_SOURCE, session);
+  const heartRate = await getDataSet(HEART_RATE_DATA_SOURCE, session);
+  const cadence = await getDataSet(CADENCE_DATA_SOURCE, session);
+
+  return [power, heartRate, cadence];
 };
 
-export const getDataSet = async (dataSource, startNs, endNs) => {
+export const getDataSet = async (baseDataSource, session) => {
+  const dataSource = await getDataSource(baseDataSource);
+  const startNs = session.startTimeMillis * 1000000;
+  const endNs = session.endTimeMillis * 1000000;
+
   const url = `https://www.googleapis.com/fitness/v1/users/me/dataSources/${dataSource.dataStreamId}/datasets/${startNs}-${endNs}`;
 
   const res = await fetch(url, {
