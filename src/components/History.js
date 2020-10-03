@@ -34,8 +34,6 @@ export const History = ({ user }) => {
 };
 
 export const HistoryTable = ({ history }) => {
-  console.log(history);
-
   if (!history) {
     return;
   }

@@ -26,7 +26,7 @@ export const toDataSetPoint = (d) => [
     originDataSourceId: "", // ???
     startTimeNanos: d.startTimeNanos,
     endTimeNanos: d.endTimeNanos,
-    value: [{ fpVal: d.power }],
+    value: [{ fpVal: d.cadence }],
   },
 ];
 
