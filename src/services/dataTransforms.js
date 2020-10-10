@@ -1,5 +1,13 @@
 import differenceInMinutes from "date-fns/differenceInMinutes";
 import format from "date-fns/format";
+import {
+  CADENCE,
+  CALORIES,
+  HEART_POINTS,
+  HEART_RATE,
+  MOVE_MINUTES,
+  POWER,
+} from "./googleFitService";
 
 const getCalories = (d) => {
   // // https://www.youtube.com/watch?v=U_ox319Z8og
@@ -62,7 +70,7 @@ const average = (arr) =>
 export const toDataSetPoints = (d) => [
   // https://developers.google.com/fit/datatypes/activity#power
   {
-    dataTypeName: "com.google.power.sample",
+    dataTypeName: POWER,
     originDataSourceId: "", // ???
     startTimeNanos: d.startTimeNanos,
     endTimeNanos: d.endTimeNanos,
@@ -71,7 +79,7 @@ export const toDataSetPoints = (d) => [
 
   // https://developers.google.com/fit/datatypes/body#heart_rate
   {
-    dataTypeName: "com.google.heart_rate.bpm",
+    dataTypeName: HEART_RATE,
     originDataSourceId: "", // ???
     startTimeNanos: d.startTimeNanos,
     endTimeNanos: d.endTimeNanos,
@@ -80,7 +88,7 @@ export const toDataSetPoints = (d) => [
 
   // https://developers.google.com/fit/datatypes/activity#cycling_pedaling_cadence
   {
-    dataTypeName: "com.google.cycling.pedaling.cadence",
+    dataTypeName: CADENCE,
     originDataSourceId: "", // ???
     startTimeNanos: d.startTimeNanos,
     endTimeNanos: d.endTimeNanos,
@@ -88,7 +96,7 @@ export const toDataSetPoints = (d) => [
   },
 
   {
-    dataTypeName: "com.google.active_minutes",
+    dataTypeName: MOVE_MINUTES,
     originDataSourceId: "",
     startTimeNanos: d.startTimeNanos,
     endTimeNanos: d.endTimeNanos,
@@ -96,7 +104,7 @@ export const toDataSetPoints = (d) => [
   },
 
   {
-    dataTypeName: "com.google.heart_minutes",
+    dataTypeName: HEART_POINTS,
     originDataSourceId: "",
     startTimeNanos: d.startTimeNanos,
     endTimeNanos: d.endTimeNanos,
@@ -104,7 +112,7 @@ export const toDataSetPoints = (d) => [
   },
 
   {
-    dataTypeName: "com.google.calories.expended",
+    dataTypeName: CALORIES,
     originDataSourceId: "",
     startTimeNanos: d.startTimeNanos,
     endTimeNanos: d.endTimeNanos,
@@ -112,31 +120,13 @@ export const toDataSetPoints = (d) => [
   },
 ];
 
-// TODO how do we know these will always be in that order?
 export const toDataSource = (points) => {
-  const power = points.find(
-    (p) => p[0].dataTypeName === "com.google.power.sample"
-  );
-
-  const heartRate = points.find(
-    (p) => p[0].dataTypeName === "com.google.heart_rate.bpm"
-  );
-
-  const cadence = points.find(
-    (p) => p[0].dataTypeName === "com.google.cycling.pedaling.cadence"
-  );
-
-  const moveMinutes = points.find(
-    (p) => p[0].dataTypeName === "com.google.active_minutes"
-  );
-
-  const heartPoints = points.find(
-    (p) => p[0].dataTypeName === "com.google.heart_minutes"
-  );
-
-  const calories = points.find(
-    (p) => p[0].dataTypeName === "com.google.calories.expended"
-  );
+  const power = points.find((p) => p[0].dataTypeName === POWER);
+  const heartRate = points.find((p) => p[0].dataTypeName === HEART_RATE);
+  const cadence = points.find((p) => p[0].dataTypeName === CADENCE);
+  const moveMinutes = points.find((p) => p[0].dataTypeName === MOVE_MINUTES);
+  const heartPoints = points.find((p) => p[0].dataTypeName === HEART_POINTS);
+  const calories = points.find((p) => p[0].dataTypeName === CALORIES);
 
   const minStartTimeNs = power[0].startTimeNanos;
   const maxEndTimeNs = power[power.length - 1].endTimeNanos;

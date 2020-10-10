@@ -61,6 +61,7 @@ function App() {
       )
       .subscribe((dataSources) => {
         // TODO only upload if logged in? save local otherwise?
+        // TODO better async here
         setMessage("Uploading...");
         // uploadSession(powerDs, heartRateDs, cadenceDs);
         console.log(dataSources);

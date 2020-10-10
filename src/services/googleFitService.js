@@ -3,6 +3,13 @@
 import { getUserCookie } from "./cookieService";
 import subDays from "date-fns/subDays";
 
+export const POWER = "com.google.power.sample";
+export const HEART_RATE = "com.google.heart_rate.bpm";
+export const CADENCE = "com.google.cycling.pedaling.cadence";
+export const MOVE_MINUTES = "com.google.active_minutes";
+export const HEART_POINTS = "com.google.heart_minutes";
+export const CALORIES = "com.google.calories.expended";
+
 const APPLICATION = {
   detailsUrl: "https://github.com/ericsakmar/connected-bike",
   name: "Connected Bike",
