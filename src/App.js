@@ -14,7 +14,7 @@ import { BluethoothIcon, PlayIcon, StopIcon } from "./Icons";
 import "./App.css";
 import { AccountControls } from "./components/AccountControls";
 import { nowNs, uploadSession } from "./services/googleFitService";
-import { toDataSetPoint, toDataSource } from "./services/dataTransforms";
+import { toDataSetPoints, toDataSource } from "./services/dataTransforms";
 import { History } from "./components/History";
 
 const DISCONNECTED = "disconnected";
@@ -51,8 +51,9 @@ function App() {
           const timeDiff = c.startTimeNanos - p.startTimeNanos;
           return { ...p, endTimeNanos: p.startTimeNanos + timeDiff };
         }),
-        mergeMap((d) => toDataSetPoint(d)),
+        mergeMap((d) => toDataSetPoints(d)),
         takeWhile(() => isRecording.current),
+        // TODO maybe filter out zeroes here??
         groupBy((d) => d.dataTypeName),
         mergeMap((d) => d.pipe(toArray())),
         toArray(),

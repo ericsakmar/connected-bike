@@ -1,7 +1,7 @@
 import differenceInMinutes from "date-fns/differenceInMinutes";
 import format from "date-fns/format";
 
-export const toDataSetPoint = (d) => [
+export const toDataSetPoints = (d) => [
   // https://developers.google.com/fit/datatypes/activity#power
   {
     dataTypeName: "com.google.power.sample",
@@ -28,7 +28,74 @@ export const toDataSetPoint = (d) => [
     endTimeNanos: d.endTimeNanos,
     value: [{ fpVal: d.cadence }],
   },
+
+  {
+    dataTypeName: "com.google.active_minutes",
+    originDataSourceId: "",
+    startTimeNanos: d.startTimeNanos,
+    endTimeNanos: d.endTimeNanos,
+    value: [{ intVal: getMoveMinutes(d) }],
+  },
+
+  {
+    dataTypeName: "com.google.heart_minutes",
+    originDataSourceId: "",
+    startTimeNanos: d.startTimeNanos,
+    endTimeNanos: d.endTimeNanos,
+    value: [{ fpVal: getHeartPoints(d) }],
+  },
+
+  {
+    dataTypeName: "com.google.calories.expended",
+    originDataSourceId: "",
+    startTimeNanos: d.startTimeNanos,
+    endTimeNanos: d.endTimeNanos,
+    value: [{ fpVal: getCalories(d) }],
+  },
 ];
+
+const getCalories = (d) => {
+  // // https://www.youtube.com/watch?v=U_ox319Z8og
+  // const watts = d.power;
+  // const kw = watts / 1000;
+  // const hours = (d.endTimeNanos - d.startTimeNanos) / 3600000000000;
+  // const kwh = kw * hours;
+  // const kcal = kwh * 860;
+  // return kcal;
+
+  // https://gearandgrit.com/convert-watts-calories-burned-cycling/
+  const hours = (d.endTimeNanos - d.startTimeNanos) / 3600000000000;
+  return d.power * hours * 3.6;
+};
+
+// Fit calls this "minutes", but it's really milliseconds
+const getMoveMinutes = (d) => {
+  if (d.cadence === 0) {
+    return 0;
+  }
+
+  const ms = Math.round((d.endTimeNanos - d.startTimeNanos) / 1000000);
+
+  return ms;
+};
+
+const getHeartPoints = (d) => {
+  // TODO get from Fit???
+  const age = 36;
+
+  // https://www.cdc.gov/physicalactivity/basics/measuring/heartrate.htm
+  const maxHeartRate = 220 - age;
+
+  // https://developers.google.com/fit/datatypes/activity#heart_points
+  const isHighIntensity = d.heartRate > maxHeartRate * 0.7;
+  const isMidIntensity = d.heartRate > maxHeartRate * 0.5;
+
+  const heartPointsPerMinute = isHighIntensity ? 2 : isMidIntensity ? 1 : 0;
+  const minutes = (d.endTimeNanos - d.startTimeNanos) / 60000000000;
+  const heartPoints = heartPointsPerMinute * minutes;
+
+  return heartPoints;
+};
 
 export const toDataSource = ([powerPoints, heartRatePoints, cadencePoints]) => {
   const minStartTimeNs = powerPoints[0].startTimeNanos;
