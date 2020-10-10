@@ -14,7 +14,7 @@ import { BluethoothIcon, PlayIcon, StopIcon } from "./Icons";
 import "./App.css";
 import { AccountControls } from "./components/AccountControls";
 import { nowNs, uploadSession } from "./services/googleFitService";
-import { toDataSetPoints, toDataSource } from "./services/dataTransforms";
+import { toDataSetPoints, toDataSets } from "./services/dataTransforms";
 import { History } from "./components/History";
 
 const DISCONNECTED = "disconnected";
@@ -37,6 +37,14 @@ function App() {
     bikeData$.current.pipe(throttleTime(2000)).subscribe(setDisplayData);
   };
 
+  const handleUpload = async (dataSets) => {
+    // TODO only upload if logged in? save local otherwise?
+    // TODO some kind of error handling?
+    setMessage("Uploading...");
+    await uploadSession(dataSets);
+    setMessage("Upload complete!");
+  };
+
   const handleRecord = () => {
     setActivityState(RECORDING);
     isRecording.current = true;
@@ -57,16 +65,9 @@ function App() {
         groupBy((d) => d.dataTypeName),
         mergeMap((d) => d.pipe(toArray())),
         toArray(),
-        map((points) => toDataSource(points))
+        map((points) => toDataSets(points))
       )
-      .subscribe((dataSources) => {
-        // TODO only upload if logged in? save local otherwise?
-        // TODO better async here
-        setMessage("Uploading...");
-        // uploadSession(powerDs, heartRateDs, cadenceDs);
-        console.log(dataSources);
-        setMessage("Upload complete!");
-      });
+      .subscribe(handleUpload);
   };
 
   const handleStop = () => {
@@ -77,7 +78,11 @@ function App() {
   return (
     <div className="app">
       <h1>connected bike</h1>
-      {message && <div>{message}</div>}
+      {message && (
+        <div>
+          <span className="message">{message}</span>
+        </div>
+      )}
 
       {activityState === DISCONNECTED && (
         <button onClick={handleConnect}>

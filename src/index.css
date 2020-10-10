@@ -27,10 +27,6 @@ button {
   transition: box-shadow 200ms ease-in-out;
 }
 
-button:hover {
-  box-shadow: 0.5rem 0.5rem 0px 0px var(--bluegreen);
-}
-
 button:active {
   box-shadow: 0.5rem 0.5rem 0px 0px var(--purple);
 }

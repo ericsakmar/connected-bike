@@ -5,3 +5,10 @@
 .account-controls {
   margin-top: 5rem;
 }
+
+.message {
+  background-color: var(--yellow);
+  padding: 0.5rem 1rem;
+  margin: 2rem 0;
+  display: inline-block;
+}

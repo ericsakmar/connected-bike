@@ -120,7 +120,7 @@ export const toDataSetPoints = (d) => [
   },
 ];
 
-export const toDataSource = (points) => {
+export const toDataSets = (points) => {
   const power = points.find((p) => p[0].dataTypeName === POWER);
   const heartRate = points.find((p) => p[0].dataTypeName === HEART_RATE);
   const cadence = points.find((p) => p[0].dataTypeName === CADENCE);

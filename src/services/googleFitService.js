@@ -28,7 +28,7 @@ const POWER_DATA_SOURCE = {
   dataStreamName: "Connected Bike - Power",
   type: "raw",
   application: APPLICATION,
-  dataType: { name: "com.google.power.sample" },
+  dataType: { name: POWER },
   device: DEVICE,
 };
 
@@ -36,7 +36,7 @@ const HEART_RATE_DATA_SOURCE = {
   dataStreamName: "Connected Bike - Heart Rate",
   type: "raw",
   application: APPLICATION,
-  dataType: { name: "com.google.heart_rate.bpm" },
+  dataType: { name: HEART_RATE },
   device: DEVICE,
 };
 
@@ -44,7 +44,31 @@ const CADENCE_DATA_SOURCE = {
   dataStreamName: "Connected Bike - Cadence",
   type: "raw",
   application: APPLICATION,
-  dataType: { name: "com.google.cycling.pedaling.cadence" },
+  dataType: { name: CADENCE },
+  device: DEVICE,
+};
+
+const MOVE_MINUTES_DATA_SOURCE = {
+  dataStreamName: "Connected Bike - Move Minutes",
+  type: "raw",
+  application: APPLICATION,
+  dataType: { name: MOVE_MINUTES },
+  device: DEVICE,
+};
+
+const HEART_POINTS_DATA_SOURCE = {
+  dataStreamName: "Connected Bike - Heart Points",
+  type: "raw",
+  application: APPLICATION,
+  dataType: { name: HEART_POINTS },
+  device: DEVICE,
+};
+
+const CALORIES_DATA_SOURCE = {
+  dataStreamName: "Connected Bike - Calories",
+  type: "raw",
+  application: APPLICATION,
+  dataType: { name: CALORIES },
   device: DEVICE,
 };
 
@@ -123,10 +147,23 @@ export const uploadDataSet = async (baseDataSource, dataSet) => {
   return res.ok;
 };
 
-export const uploadSession = async (powerData, heartRateData, cadenceData) => {
+const findDataSet = (dataSets, id) =>
+  dataSets.find((d) => d.point[0].dataTypeName === id);
+
+export const uploadSession = async (dataSets) => {
+  const powerData = findDataSet(dataSets, POWER);
+  const heartRateData = findDataSet(dataSets, HEART_RATE);
+  const cadenceData = findDataSet(dataSets, CADENCE);
+  const moveMinutes = findDataSet(dataSets, MOVE_MINUTES);
+  const heartPoints = findDataSet(dataSets, HEART_POINTS);
+  const calories = findDataSet(dataSets, CALORIES);
+
   await uploadDataSet(POWER_DATA_SOURCE, powerData);
   await uploadDataSet(HEART_RATE_DATA_SOURCE, heartRateData);
   await uploadDataSet(CADENCE_DATA_SOURCE, cadenceData);
+  await uploadDataSet(MOVE_MINUTES_DATA_SOURCE, moveMinutes);
+  await uploadDataSet(HEART_POINTS_DATA_SOURCE, heartPoints);
+  await uploadDataSet(CALORIES_DATA_SOURCE, calories);
 
   const startTimeMillis = Math.round(powerData.minStartTimeNs / 1000000);
   const endTimeMillis = Math.round(powerData.maxEndTimeNs / 1000000);
