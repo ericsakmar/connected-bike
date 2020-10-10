@@ -59,10 +59,11 @@ function App() {
         toArray(),
         map((points) => toDataSource(points))
       )
-      .subscribe(([powerDs, heartRateDs, cadenceDs]) => {
+      .subscribe((dataSources) => {
         // TODO only upload if logged in? save local otherwise?
         setMessage("Uploading...");
-        uploadSession(powerDs, heartRateDs, cadenceDs);
+        // uploadSession(powerDs, heartRateDs, cadenceDs);
+        console.log(dataSources);
         setMessage("Upload complete!");
       });
   };
