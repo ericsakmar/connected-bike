@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { toDisplay } from "../services/dataTransforms";
 import { getHistory } from "../services/googleFitService";
 import "./History.css";
+import { Session } from "./Session";
 
 export const History = ({ user }) => {
   const [message, setMessage] = useState();
@@ -21,52 +22,16 @@ export const History = ({ user }) => {
     }
   }, [user]);
 
-  if (!user) {
+  if (!user || !history) {
     return null;
   }
+
+  const sessions = history.map((session) => <Session session={session} />);
 
   return (
     <div className="history">
       {message && <div>{message}</div>}
-      {history && <HistoryTable history={history} />}
+      {history && sessions}
     </div>
-  );
-};
-
-export const HistoryTable = ({ history }) => {
-  if (!history) {
-    return;
-  }
-
-  return (
-    <table className="history-table">
-      <thead>
-        <tr>
-          <th>Start</th>
-          <th className="number">Length</th>
-          <th className="number">Power</th>
-          <th className="number">Heart Rate</th>
-          <th className="number">Cadence</th>
-          <th className="number">Move Minutes</th>
-          <th className="number">Heart Points</th>
-          <th className="number">Calories</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        {history.map((d) => (
-          <tr key={d.startTime}>
-            <td>{d.startTime}</td>
-            <td className="number">{d.length}</td>
-            <td className="number">{d.averagePower}</td>
-            <td className="number">{d.averageHeartRate}</td>
-            <td className="number">{d.averageCadence}</td>
-            <td className="number">{d.totalMoveMinutes}</td>
-            <td className="number">{d.totalHeartPoints}</td>
-            <td className="number">{d.totalCalories}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
   );
 };

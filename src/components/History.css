@@ -6,6 +6,10 @@
   margin: 0 auto;
 }
 
+.history-table td {
+  text-align: left;
+}
+
 .history-table th {
   text-align: left;
   border-bottom: 1px solid var(--gray);

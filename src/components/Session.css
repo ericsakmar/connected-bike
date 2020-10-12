@@ -1,0 +1,13 @@
+.session {
+  text-align: left;
+  margin: 2rem;
+}
+
+.totals {
+  display: flex;
+  flex-direction: row;
+}
+
+.total {
+  margin-right: 1rem;
+}
