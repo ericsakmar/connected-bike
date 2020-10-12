@@ -47,6 +47,9 @@ export const HistoryTable = ({ history }) => {
           <th className="number">Power</th>
           <th className="number">Heart Rate</th>
           <th className="number">Cadence</th>
+          <th className="number">Move Minutes</th>
+          <th className="number">Heart Points</th>
+          <th className="number">Calories</th>
         </tr>
       </thead>
 
@@ -58,6 +61,9 @@ export const HistoryTable = ({ history }) => {
             <td className="number">{d.averagePower}</td>
             <td className="number">{d.averageHeartRate}</td>
             <td className="number">{d.averageCadence}</td>
+            <td className="number">{d.totalMoveMinutes}</td>
+            <td className="number">{d.totalHeartPoints}</td>
+            <td className="number">{d.totalCalories}</td>
           </tr>
         ))}
       </tbody>

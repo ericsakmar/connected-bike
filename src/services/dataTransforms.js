@@ -25,13 +25,12 @@ const getCalories = (d) => {
   // TODO add bmr
 };
 
-// Fit calls this "minutes", but it's really milliseconds
 const getMoveMinutes = (d) => {
   if (d.cadence === 0) {
     return 0;
   }
 
-  const ms = Math.round((d.endTimeNanos - d.startTimeNanos) / 1000000);
+  const ms = Math.round((d.endTimeNanos - d.startTimeNanos) / 60000000000);
 
   return ms;
 };
@@ -56,16 +55,28 @@ const getHeartPoints = (d) => {
 
 const sortPoint = (a, b) => a.startTimeNanos - b.startTimeNanos;
 
+const getValue = (point) => {
+  if (point.value[0].fpVal !== undefined) {
+    return point.value[0].fpVal;
+  }
+
+  if (point.value[0].intVal !== undefined) {
+    return point.value[0].intVal;
+  }
+
+  return undefined;
+};
+
 const toDisplayPoint = (p) => ({
   startTime: Math.round(p.startTimeNanos / 1000000),
   endTime: Math.round(p.endTimeNanos / 1000000),
-  value: p.value[0].fpVal,
+  value: getValue(p),
 });
 
-const average = (arr) =>
-  arr.length
-    ? Math.round(arr.reduce((acc, d) => acc + d.value, 0) / arr.length)
-    : 0;
+const average = (arr) => sum(arr) / arr.length;
+
+const sum = (arr) =>
+  arr.length ? arr.reduce((acc, d) => acc + d.value, 0) : 0;
 
 export const toDataSetPoints = (d) => [
   // https://developers.google.com/fit/datatypes/activity#power
@@ -194,9 +205,24 @@ export const toDisplay = (sessions) => {
       .sort(sortPoint)
       .map(toDisplayPoint);
 
-    const averagePower = average(power);
-    const averageHeartRate = average(heartRate);
-    const averageCadence = average(cadence);
+    const moveMinutes = session.dataSets.moveMinutes.point
+      .sort(sortPoint)
+      .map(toDisplayPoint);
+
+    const heartPoints = session.dataSets.heartPoints.point
+      .sort(sortPoint)
+      .map(toDisplayPoint);
+
+    const calories = session.dataSets.calories.point
+      .sort(sortPoint)
+      .map(toDisplayPoint);
+
+    const averagePower = average(power).toFixed(1);
+    const averageHeartRate = Math.round(average(heartRate));
+    const averageCadence = Math.round(average(cadence));
+    const totalMoveMinutes = Math.round(sum(moveMinutes));
+    const totalHeartPoints = Math.round(sum(heartPoints));
+    const totalCalories = Math.round(sum(calories));
 
     return {
       averageCadence,
@@ -206,6 +232,9 @@ export const toDisplay = (sessions) => {
       heartRate,
       length,
       power,
+      totalMoveMinutes,
+      totalHeartPoints,
+      totalCalories,
       name: session.session.name,
       startTime: format(startTime, "EEE, MMM d 'at' h:mm aaaa"),
     };

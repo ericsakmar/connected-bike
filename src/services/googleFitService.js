@@ -219,8 +219,14 @@ export const getDataSets = async (session) => {
   const power = await getDataSet(POWER_DATA_SOURCE, session);
   const heartRate = await getDataSet(HEART_RATE_DATA_SOURCE, session);
   const cadence = await getDataSet(CADENCE_DATA_SOURCE, session);
+  const moveMinutes = await getDataSet(MOVE_MINUTES_DATA_SOURCE, session);
+  const heartPoints = await getDataSet(HEART_POINTS_DATA_SOURCE, session);
+  const calories = await getDataSet(CALORIES_DATA_SOURCE, session);
 
-  return { session, dataSets: { power, heartRate, cadence } };
+  return {
+    session,
+    dataSets: { power, heartRate, cadence, moveMinutes, heartPoints, calories },
+  };
 };
 
 export const getDataSet = async (baseDataSource, session) => {
