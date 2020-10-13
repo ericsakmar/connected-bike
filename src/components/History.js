@@ -26,7 +26,9 @@ export const History = ({ user }) => {
     return null;
   }
 
-  const sessions = history.map((session) => <Session session={session} />);
+  const sessions = history.map((session) => (
+    <Session session={session} key={session.name} />
+  ));
 
   return (
     <div className="history">

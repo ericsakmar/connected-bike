@@ -20,6 +20,11 @@ export const AccountControls = ({ onUserLoaded }) => {
   const [loggedIn, setLoggedIn] = useState(false);
 
   const handleLogin = (response) => {
+    setUserCookie({
+      ...response.profileObj,
+      accessToken: response.wc.access_token,
+    });
+
     if (response.wc.access_token) {
       onUserLoaded({
         ...response.profileObj,
@@ -28,11 +33,6 @@ export const AccountControls = ({ onUserLoaded }) => {
       });
       setLoggedIn(true);
     }
-
-    setUserCookie({
-      ...response.profileObj,
-      accessToken: response.wc.access_token,
-    });
   };
 
   const handleLogout = () => {

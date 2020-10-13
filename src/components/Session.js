@@ -2,6 +2,12 @@ import React from "react";
 import { LineChart } from "./LineChart";
 import "./Session.css";
 
+const Emoji = ({ symbol }) => (
+  <span className="emoji" role="img" aria-hidden="true">
+    {symbol}
+  </span>
+);
+
 export const Session = ({ session }) => {
   const heartRateChartData = session.heartRate.filter((_d, i) => i % 10 === 0);
   const powerChartData = session.power.filter((_d, i) => i % 10 === 0);
@@ -13,27 +19,37 @@ export const Session = ({ session }) => {
 
       <div className="totals">
         <div className="total">
-          🔥 {session.totalCalories} <span className="label">kcal</span>
+          <Emoji symbol="🔥" />
+          {session.totalCalories}
+          <span className="label"> kcal</span>
         </div>
 
         <div className="total">
-          ⏰ {session.totalMoveMinutes} <span className="label">minutes</span>
+          <Emoji symbol="⏰" />
+          {session.totalMoveMinutes}
+          <span className="label"> minutes</span>
         </div>
 
         <div className="total">
-          ❤️ {session.totalHeartPoints} <span className="label">points</span>
+          <Emoji symbol="❤" />️{session.totalHeartPoints}
+          <span className="label"> points</span>
         </div>
 
         <div className="total">
-          💓️ {session.averageHeartRate} <span className="label">bpm</span>
+          <Emoji symbol="💓️" />
+          {session.averageHeartRate}
+          <span className="label"> bpm</span>
         </div>
 
         <div className="total">
-          ⚡️ {session.averagePower} <span className="label">watts</span>
+          <Emoji symbol="⚡" />️{session.averagePower}
+          <span className="label"> watts</span>
         </div>
 
         <div className="total">
-          🔄️ {session.averageCadence} <span className="label">rpm</span>
+          <Emoji symbol="🔄️" />
+          {session.averageCadence}
+          <span className="label"> rpm</span>
         </div>
       </div>
 
