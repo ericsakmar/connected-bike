@@ -217,7 +217,7 @@ export const toDisplay = (sessions) => {
       .sort(sortPoint)
       .map(toDisplayPoint);
 
-    const averagePower = average(power).toFixed(1);
+    const averagePower = Math.round(average(power));
     const averageHeartRate = Math.round(average(heartRate));
     const averageCadence = Math.round(average(cadence));
     const totalMoveMinutes = Math.round(sum(moveMinutes));
