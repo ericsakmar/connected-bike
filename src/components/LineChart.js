@@ -54,7 +54,7 @@ export const LineChart = ({ data, color }) => {
   const chartRef = useRef();
 
   useEffect(() => {
-    draw(chartRef, data, 300, 100, color);
+    draw(chartRef, data, 200, 100, color);
   }, [data, color]);
 
   return <div ref={chartRef} className="line-chart"></div>;
