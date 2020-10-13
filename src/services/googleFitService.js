@@ -207,9 +207,9 @@ export const getSessions = async () => {
 export const getHistory = async () => {
   const allSessions = await getSessions();
 
-  const sessions = allSessions.filter(
-    (s) => s.application.name === APPLICATION.name
-  );
+  const sessions = allSessions
+    .filter((s) => s.application.name === APPLICATION.name)
+    .sort((a, b) => b.startTimeMillis - a.startTimeMillis);
 
   const data = Promise.all(sessions.map((session) => getDataSets(session)));
   return data;
