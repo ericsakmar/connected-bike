@@ -99,23 +99,15 @@ export const getDataSources = async () => {
 export const getDataSource = async (baseDataSource) => {
   const name = baseDataSource.dataStreamName;
 
-  // check local cache
-  const localDataSource = localStorage.getItem(name);
-  if (localDataSource) {
-    return JSON.parse(localDataSource);
-  }
-
   // check if it already exists online
   const dataSources = await getDataSources();
   const remoteDataSource = dataSources.find((d) => d.dataStreamName === name);
   if (remoteDataSource) {
-    localStorage.setItem(name, JSON.stringify(remoteDataSource));
     return remoteDataSource;
   }
 
   // it doesn't exist, so add it
   const newDataSource = await createDataSource(baseDataSource);
-  localStorage.setItem(name, JSON.stringify(remoteDataSource));
   return newDataSource;
 };
 
