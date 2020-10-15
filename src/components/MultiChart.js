@@ -11,7 +11,7 @@ const getNearestPoint = (mouseX, data, scaleX, scaleY) => {
   const nearestY = scaleY(d.value);
   const nearestX = scaleX(d.startTime);
 
-  return { x: nearestX, y: nearestY };
+  return { d, x: nearestX, y: nearestY };
 };
 
 const addLine = (data, line, color) => (el) =>
@@ -36,14 +36,24 @@ const addVertical = (start, end) => (el) =>
     .attr("y1", start)
     .attr("y2", end);
 
-const addDot = (id, color) => (el) =>
-  el
+const addDot = (id, color) => (el) => {
+  const group = el.append("g").classed(`label_${id}`, true);
+
+  group
     .append("circle")
-    .classed(`mouse-dot_${id}`, true)
-    .attr("r", 5)
+    .attr("r", 7)
     .attr("fill", `var(--${color})`)
     .attr("cx", 0)
     .attr("cy", 0);
+
+  group
+    .append("text")
+    .classed(`label-text_${id}`, true)
+    .attr("text-anchor", "middle")
+    .attr("font-size", "10px")
+    .attr("y", 3)
+    .text("");
+};
 
 const draw = (ref, heartRate, power, cadence) => {
   const totalHeight = 300;
@@ -52,7 +62,7 @@ const draw = (ref, heartRate, power, cadence) => {
   const segmentHeight = 50;
   const segmentPadding = 35;
 
-  const margin = { top: 2, right: 5, bottom: 2, left: 30 },
+  const margin = { top: 2, right: 10, bottom: 2, left: 30 },
     width = totalWidth - margin.left - margin.right,
     height = totalHeight - margin.top - margin.bottom;
 
@@ -119,8 +129,12 @@ const draw = (ref, heartRate, power, cadence) => {
     .x((d) => x(d.startTime))
     .y((d) => cadenceY(d.value));
 
-  const mouseArea = svg.append("g");
+  // lines
+  svg.call(addLine(heartRate, heartRateLine, "red"));
+  svg.call(addLine(power, powerLine, "green"));
+  svg.call(addLine(cadence, cadenceLine, "yellow"));
 
+  const mouseArea = svg.append("g");
   mouseArea
     .append("rect")
     .attr("width", width)
@@ -143,19 +157,25 @@ const draw = (ref, heartRate, power, cadence) => {
         .attr("x2", nearestHeartRate.x);
 
       svg
-        .selectAll(".mouse-dot_heart-rate")
-        .attr("cx", nearestHeartRate.x)
-        .attr("cy", nearestHeartRate.y);
+        .selectAll(".label_heart-rate")
+        .attr(
+          "transform",
+          `translate(${nearestHeartRate.x}, ${nearestHeartRate.y})`
+        );
+      svg.selectAll(".label-text_heart-rate").text(nearestHeartRate.d.value);
 
       svg
-        .selectAll(".mouse-dot_power")
-        .attr("cx", nearestPower.x)
-        .attr("cy", nearestPower.y);
+        .selectAll(".label_power")
+        .attr("transform", `translate(${nearestPower.x}, ${nearestPower.y})`);
+      svg.selectAll(".label-text_power").text(nearestPower.d.value);
 
       svg
-        .selectAll(".mouse-dot_cadence")
-        .attr("cx", nearestCadence.x)
-        .attr("cy", nearestCadence.y);
+        .selectAll(".label_cadence")
+        .attr(
+          "transform",
+          `translate(${nearestCadence.x}, ${nearestCadence.y})`
+        );
+      svg.selectAll(".label-text_cadence").text(nearestCadence.d.value);
     });
 
   // verticals
@@ -167,11 +187,6 @@ const draw = (ref, heartRate, power, cadence) => {
   mouseArea.call(addDot("heart-rate", "red"));
   mouseArea.call(addDot("power", "green"));
   mouseArea.call(addDot("cadence", "yellow"));
-
-  // lines
-  svg.call(addLine(heartRate, heartRateLine, "red"));
-  svg.call(addLine(power, powerLine, "green"));
-  svg.call(addLine(cadence, cadenceLine, "yellow"));
 
   svg
     .append("text")
