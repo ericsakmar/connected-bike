@@ -27,7 +27,7 @@ export const History = ({ user }) => {
   }
 
   const sessions = history.map((session) => (
-    <Session session={session} key={session.name} />
+    <Session session={session} key={session.startTime} />
   ));
 
   return (
