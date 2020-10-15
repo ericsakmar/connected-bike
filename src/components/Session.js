@@ -1,5 +1,5 @@
 import React from "react";
-import { LineChart } from "./LineChart";
+import { MultiChart } from "./MultiChart";
 import "./Session.css";
 
 const Emoji = ({ symbol }) => (
@@ -56,18 +56,11 @@ export const Session = ({ session }) => {
 
         <div className="charts">
           <div className="chart">
-            <h3>Heart Rate</h3>
-            <LineChart data={heartRateChartData} color="red" />
-          </div>
-
-          <div className="chart">
-            <h3>Power</h3>
-            <LineChart data={powerChartData} color="green" />
-          </div>
-
-          <div className="chart">
-            <h3>Cadence</h3>
-            <LineChart data={cadenceChartData} color="yellow" />
+            <MultiChart
+              heartRate={heartRateChartData}
+              power={powerChartData}
+              cadence={cadenceChartData}
+            />
           </div>
         </div>
       </div>
