@@ -59,6 +59,14 @@ const addDot = (id, color) => (el) => {
     .text("");
 };
 
+const updateDot = (id, nearest) => (el) => {
+  el.selectAll(`.label_${id}`)
+    .attr("display", null)
+    .attr("transform", `translate(${nearest.x}, ${nearest.y})`);
+
+  el.selectAll(`.label-text_${id}`).text(nearest.d.value);
+};
+
 const draw = (ref, heartRate, power, cadence) => {
   const totalHeight = 300;
   const totalWidth = 200;
@@ -161,29 +169,9 @@ const draw = (ref, heartRate, power, cadence) => {
         .attr("x1", nearestHeartRate.x)
         .attr("x2", nearestHeartRate.x);
 
-      svg
-        .selectAll(".label_heart-rate")
-        .attr("display", null)
-        .attr(
-          "transform",
-          `translate(${nearestHeartRate.x}, ${nearestHeartRate.y})`
-        );
-      svg.selectAll(".label-text_heart-rate").text(nearestHeartRate.d.value);
-
-      svg
-        .selectAll(".label_power")
-        .attr("display", null)
-        .attr("transform", `translate(${nearestPower.x}, ${nearestPower.y})`);
-      svg.selectAll(".label-text_power").text(nearestPower.d.value);
-
-      svg
-        .selectAll(".label_cadence")
-        .attr("display", null)
-        .attr(
-          "transform",
-          `translate(${nearestCadence.x}, ${nearestCadence.y})`
-        );
-      svg.selectAll(".label-text_cadence").text(nearestCadence.d.value);
+      mouseArea.call(updateDot("heart-rate", nearestHeartRate));
+      mouseArea.call(updateDot("power", nearestPower));
+      mouseArea.call(updateDot("cadence", nearestCadence));
     });
 
   // verticals
