@@ -2,6 +2,24 @@ import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
 import "./LineChart.css";
 
+const buildChartData = (start, x, data) => {
+  const end = start + 50;
+
+  const y = d3
+    .scaleLinear()
+    .domain([d3.min(data, (d) => d.value), d3.max(data, (d) => d.value)])
+    .range([end, start]);
+
+  const line = d3
+    .line()
+    .curve(d3.curveBasis)
+    .defined((d) => !isNaN(d.value))
+    .x((d) => x(d.startTime))
+    .y((d) => y(d.value));
+
+  return { start, y, line, end };
+};
+
 const bisectDate = d3.bisector((d) => d.startTime).left;
 
 const getNearestPoint = (mouseX, data, scaleX, scaleY) => {
@@ -70,8 +88,6 @@ const updateDot = (id, nearest) => (el) => {
 const draw = (ref, heartRate, power, cadence) => {
   const totalHeight = 300;
   const totalWidth = 200;
-
-  const segmentHeight = 50;
   const segmentPadding = 28;
 
   const margin = { top: 2, right: 10, bottom: 2, left: 30 },
@@ -96,27 +112,19 @@ const draw = (ref, heartRate, power, cadence) => {
       d3.min(heartRate, (d) => d.startTime),
     ]);
 
-  const buildChartData = (start, data) => {
-    const end = start + segmentHeight;
+  const heartRateChart = buildChartData(20, x, heartRate);
 
-    const y = d3
-      .scaleLinear()
-      .domain([d3.min(data, (d) => d.value), d3.max(data, (d) => d.value)])
-      .range([end, start]);
+  const powerChart = buildChartData(
+    heartRateChart.end + segmentPadding,
+    x,
+    power
+  );
 
-    const line = d3
-      .line()
-      .curve(d3.curveBasis)
-      .defined((d) => !isNaN(d.value))
-      .x((d) => x(d.startTime))
-      .y((d) => y(d.value));
-
-    return { start, y, line, end };
-  };
-
-  const heartRateChart = buildChartData(20, heartRate);
-  const powerChart = buildChartData(heartRateChart.end + segmentPadding, power);
-  const cadenceChart = buildChartData(powerChart.end + segmentPadding, cadence);
+  const cadenceChart = buildChartData(
+    powerChart.end + segmentPadding,
+    x,
+    cadence
+  );
 
   // lines
   svg.call(addLine(heartRate, heartRateChart.line, "red"));
