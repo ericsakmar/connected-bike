@@ -96,55 +96,32 @@ const draw = (ref, heartRate, power, cadence) => {
       d3.min(heartRate, (d) => d.startTime),
     ]);
 
-  const heartRateStart = 20;
-  const heartRateEnd = heartRateStart + segmentHeight;
-  const heartRateY = d3
-    .scaleLinear()
-    .domain([
-      d3.min(heartRate, (d) => d.value),
-      d3.max(heartRate, (d) => d.value),
-    ])
-    .range([heartRateEnd, heartRateStart]);
+  const buildChartData = (start, data) => {
+    const end = start + segmentHeight;
 
-  const heartRateLine = d3
-    .line()
-    .curve(d3.curveBasis)
-    .defined((d) => !isNaN(d.value))
-    .x((d) => x(d.startTime))
-    .y((d) => heartRateY(d.value));
+    const y = d3
+      .scaleLinear()
+      .domain([d3.min(data, (d) => d.value), d3.max(data, (d) => d.value)])
+      .range([end, start]);
 
-  const powerStart = heartRateEnd + segmentPadding;
-  const powerEnd = powerStart + segmentHeight;
-  const powerY = d3
-    .scaleLinear()
-    .domain([d3.min(power, (d) => d.value), d3.max(power, (d) => d.value)])
-    .range([powerEnd, powerStart]);
+    const line = d3
+      .line()
+      .curve(d3.curveBasis)
+      .defined((d) => !isNaN(d.value))
+      .x((d) => x(d.startTime))
+      .y((d) => y(d.value));
 
-  const powerLine = d3
-    .line()
-    .curve(d3.curveBasis)
-    .defined((d) => !isNaN(d.value))
-    .x((d) => x(d.startTime))
-    .y((d) => powerY(d.value));
+    return { start, y, line, end };
+  };
 
-  const cadenceStart = powerEnd + segmentPadding;
-  const cadenceEnd = cadenceStart + segmentHeight;
-  const cadenceY = d3
-    .scaleLinear()
-    .domain([d3.min(cadence, (d) => d.value), d3.max(cadence, (d) => d.value)])
-    .range([cadenceEnd, cadenceStart]);
-
-  const cadenceLine = d3
-    .line()
-    .curve(d3.curveBasis)
-    .defined((d) => !isNaN(d.value))
-    .x((d) => x(d.startTime))
-    .y((d) => cadenceY(d.value));
+  const heartRateChart = buildChartData(20, heartRate);
+  const powerChart = buildChartData(heartRateChart.end + segmentPadding, power);
+  const cadenceChart = buildChartData(powerChart.end + segmentPadding, cadence);
 
   // lines
-  svg.call(addLine(heartRate, heartRateLine, "red"));
-  svg.call(addLine(power, powerLine, "green"));
-  svg.call(addLine(cadence, cadenceLine, "yellow"));
+  svg.call(addLine(heartRate, heartRateChart.line, "red"));
+  svg.call(addLine(power, powerChart.line, "green"));
+  svg.call(addLine(cadence, cadenceChart.line, "yellow"));
 
   const mouseArea = svg.append("g");
   mouseArea
@@ -154,14 +131,22 @@ const draw = (ref, heartRate, power, cadence) => {
     .attr("fill", "transparent")
     .on("mousemove", (e) => {
       const mouseX = e.offsetX - margin.left;
+
       const nearestHeartRate = getNearestPoint(
         mouseX,
         heartRate,
         x,
-        heartRateY
+        heartRateChart.y
       );
-      const nearestPower = getNearestPoint(mouseX, power, x, powerY);
-      const nearestCadence = getNearestPoint(mouseX, cadence, x, cadenceY);
+
+      const nearestPower = getNearestPoint(mouseX, power, x, powerChart.y);
+
+      const nearestCadence = getNearestPoint(
+        mouseX,
+        cadence,
+        x,
+        cadenceChart.y
+      );
 
       svg
         .selectAll(".mouse-line")
@@ -175,37 +160,49 @@ const draw = (ref, heartRate, power, cadence) => {
     });
 
   // verticals
-  mouseArea.call(addVertical(heartRateStart, heartRateEnd));
-  mouseArea.call(addVertical(powerStart, powerEnd));
-  mouseArea.call(addVertical(cadenceStart, cadenceEnd));
+  mouseArea.call(addVertical(heartRateChart.start, heartRateChart.end));
+  mouseArea.call(addVertical(powerChart.start, powerChart.end));
+  mouseArea.call(addVertical(cadenceChart.start, cadenceChart.end));
 
   // dots
   mouseArea.call(addDot("heart-rate", "red"));
   mouseArea.call(addDot("power", "green"));
   mouseArea.call(addDot("cadence", "yellow"));
 
+  // labels
   svg
     .append("text")
     .text("Heart Rate")
     .attr("x", 0 - margin.left)
-    .attr("y", heartRateStart - 6);
+    .attr("y", heartRateChart.start - 6);
 
   svg
     .append("text")
     .text("Power")
     .attr("x", 0 - margin.left)
-    .attr("y", powerStart - 6);
+    .attr("y", powerChart.start - 6);
 
   svg
     .append("text")
     .text("Cadence")
     .attr("x", 0 - margin.left)
-    .attr("y", cadenceStart - 6);
+    .attr("y", cadenceChart.start - 6);
 
   // axes
-  svg.append("g").classed("label", true).call(d3.axisLeft(heartRateY).ticks(3));
-  svg.append("g").classed("label", true).call(d3.axisLeft(powerY).ticks(3));
-  svg.append("g").classed("label", true).call(d3.axisLeft(cadenceY).ticks(3));
+  svg
+    .append("g")
+    .classed("label", true)
+    .call(d3.axisLeft(heartRateChart.y).ticks(3));
+
+  svg
+    .append("g")
+    .classed("label", true)
+    .call(d3.axisLeft(powerChart.y).ticks(3));
+
+  svg
+    .append("g")
+    .classed("label", true)
+    .call(d3.axisLeft(cadenceChart.y).ticks(3));
 };
 
 export const MultiChart = ({ heartRate, power, cadence }) => {
