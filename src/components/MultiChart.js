@@ -30,14 +30,18 @@ const addVertical = (start, end) => (el) =>
     .append("line")
     .classed("mouse-line", true)
     .attr("stroke-width", "1px")
-    .attr("stroke", "black")
+    .attr("stroke", "var(--gray)")
+    .attr("display", "none")
     .attr("x1", 0)
     .attr("x2", 0)
     .attr("y1", start)
     .attr("y2", end);
 
 const addDot = (id, color) => (el) => {
-  const group = el.append("g").classed(`label_${id}`, true);
+  const group = el
+    .append("g")
+    .classed(`label_${id}`, true)
+    .attr("display", "none");
 
   group
     .append("circle")
@@ -153,11 +157,13 @@ const draw = (ref, heartRate, power, cadence) => {
 
       svg
         .selectAll(".mouse-line")
+        .attr("display", null)
         .attr("x1", nearestHeartRate.x)
         .attr("x2", nearestHeartRate.x);
 
       svg
         .selectAll(".label_heart-rate")
+        .attr("display", null)
         .attr(
           "transform",
           `translate(${nearestHeartRate.x}, ${nearestHeartRate.y})`
@@ -166,11 +172,13 @@ const draw = (ref, heartRate, power, cadence) => {
 
       svg
         .selectAll(".label_power")
+        .attr("display", null)
         .attr("transform", `translate(${nearestPower.x}, ${nearestPower.y})`);
       svg.selectAll(".label-text_power").text(nearestPower.d.value);
 
       svg
         .selectAll(".label_cadence")
+        .attr("display", null)
         .attr(
           "transform",
           `translate(${nearestCadence.x}, ${nearestCadence.y})`
