@@ -60,7 +60,7 @@ const draw = (ref, heartRate, power, cadence) => {
   const totalWidth = 200;
 
   const segmentHeight = 50;
-  const segmentPadding = 35;
+  const segmentPadding = 28;
 
   const margin = { top: 2, right: 10, bottom: 2, left: 30 },
     width = totalWidth - margin.left - margin.right,
@@ -192,19 +192,19 @@ const draw = (ref, heartRate, power, cadence) => {
     .append("text")
     .text("Heart Rate")
     .attr("x", 0 - margin.left)
-    .attr("y", heartRateStart - 8);
+    .attr("y", heartRateStart - 6);
 
   svg
     .append("text")
     .text("Power")
     .attr("x", 0 - margin.left)
-    .attr("y", powerStart - 8);
+    .attr("y", powerStart - 6);
 
   svg
     .append("text")
     .text("Cadence")
     .attr("x", 0 - margin.left)
-    .attr("y", cadenceStart - 8);
+    .attr("y", cadenceStart - 6);
 
   // axes
   svg.append("g").classed("label", true).call(d3.axisLeft(heartRateY).ticks(3));
