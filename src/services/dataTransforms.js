@@ -10,19 +10,18 @@ import {
 } from "./googleFitService";
 
 const getCalories = (d) => {
-  // // https://www.youtube.com/watch?v=U_ox319Z8og
-  // const watts = d.power;
-  // const kw = watts / 1000;
-  // const hours = (d.endTimeNanos - d.startTimeNanos) / 3600000000000;
-  // const kwh = kw * hours;
-  // const kcal = kwh * 860;
-  // return kcal;
-
   // https://gearandgrit.com/convert-watts-calories-burned-cycling/
   const hours = (d.endTimeNanos - d.startTimeNanos) / 3600000000000;
-  return d.power * hours * 3.6;
+  const fromWatts = d.power * hours * 3.6;
 
-  // TODO add bmr
+  // https://www.verywellfit.com/what-is-bmr-or-basal-metabolic-rate-3495380
+  // 88.362 + (13.397 x weight in kg) + (4.799 x height in cm) - (5.677 x age in years)
+  // TODO maybe get weight/height/age from Fit???
+  const dailyBmr = 88.362 + 13.397 * 77.1107 + 4.799 * 190.5 - 5.677 * 36;
+  const hourlyBmr = dailyBmr / 24;
+  const bmr = hourlyBmr * hours;
+
+  return fromWatts + bmr;
 };
 
 // Fit calls this "minutes", but it's really milliseconds
