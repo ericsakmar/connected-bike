@@ -1,5 +1,8 @@
 .history {
   margin-top: 5rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .history-table {

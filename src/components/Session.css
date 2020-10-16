@@ -1,9 +1,6 @@
 .session {
   text-align: left;
-  margin-top: 5rem;
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 26rem;
+  margin: 2rem;
 }
 
 .session h2 {

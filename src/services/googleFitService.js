@@ -184,7 +184,7 @@ export const uploadSession = async (dataSets) => {
 
 export const getSessions = async () => {
   const endTime = new Date();
-  const startTime = subDays(endTime, 9);
+  const startTime = subDays(endTime, 7);
   const url = `https://www.googleapis.com/fitness/v1/users/me/sessions?startTime=${startTime.toISOString()}&endTime=${endTime.toISOString()}`;
 
   const res = await fetch(url, {
