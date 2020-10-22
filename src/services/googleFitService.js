@@ -80,6 +80,19 @@ const buildHeaders = () => {
   });
 };
 
+const handleErrors = async (res) => {
+  if (!res.ok) {
+    const body = await res.text();
+
+    console.error(`${res.status}
+${res.statusText}
+${res.url}
+${body}`);
+
+    throw Error(res.statusText);
+  }
+};
+
 export const nowNs = () =>
   (window.performance.now() + window.performance.timeOrigin) * 1000000;
 
@@ -91,6 +104,8 @@ export const getDataSources = async () => {
       headers: buildHeaders(),
     }
   );
+
+  await handleErrors(res);
 
   const json = await res.json();
   return json.dataSource;
@@ -121,6 +136,8 @@ export const createDataSource = async (dataSource) => {
     }
   );
 
+  await handleErrors(res);
+
   const json = await res.json();
   return json;
 };
@@ -135,6 +152,8 @@ export const uploadDataSet = async (baseDataSource, dataSet) => {
     headers: buildHeaders(),
     body: JSON.stringify(dataSetWithId),
   });
+
+  await handleErrors(res);
 
   return res.ok;
 };
@@ -179,6 +198,8 @@ export const uploadSession = async (dataSets) => {
     body: JSON.stringify(session),
   });
 
+  await handleErrors(res);
+
   return res.ok;
 };
 
@@ -191,6 +212,8 @@ export const getSessions = async () => {
     method: "GET",
     headers: buildHeaders(),
   });
+
+  await handleErrors(res);
 
   const json = await res.json();
   return json.session;
@@ -232,6 +255,8 @@ export const getDataSet = async (baseDataSource, session) => {
     method: "GET",
     headers: buildHeaders(),
   });
+
+  await handleErrors(res);
 
   const json = await res.json();
   return json;
