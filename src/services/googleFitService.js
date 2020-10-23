@@ -93,10 +93,7 @@ ${body}`);
   }
 };
 
-export const nowNs = () =>
-  (window.performance.now() + window.performance.timeOrigin) * 1000000;
-
-export const getDataSources = async () => {
+const getDataSources = async () => {
   const res = await fetch(
     "https://www.googleapis.com/fitness/v1/users/me/dataSources",
     {
@@ -111,7 +108,7 @@ export const getDataSources = async () => {
   return json.dataSource;
 };
 
-export const getDataSource = async (baseDataSource) => {
+const getDataSource = async (baseDataSource) => {
   const name = baseDataSource.dataStreamName;
 
   // check if it already exists online
@@ -126,7 +123,7 @@ export const getDataSource = async (baseDataSource) => {
   return newDataSource;
 };
 
-export const createDataSource = async (dataSource) => {
+const createDataSource = async (dataSource) => {
   const res = await fetch(
     "https://www.googleapis.com/fitness/v1/users/me/dataSources",
     {
@@ -142,7 +139,7 @@ export const createDataSource = async (dataSource) => {
   return json;
 };
 
-export const uploadDataSet = async (baseDataSource, dataSet) => {
+const uploadDataSet = async (baseDataSource, dataSet) => {
   const dataSource = await getDataSource(baseDataSource);
   const dataSetWithId = { ...dataSet, dataSourceId: dataSource.dataStreamId };
   const url = `https://www.googleapis.com/fitness/v1/users/me/dataSources/${dataSource.dataStreamId}/datasets/${dataSetWithId.minStartTimeNs}-${dataSetWithId.maxEndTimeNs}`;
@@ -161,6 +158,69 @@ export const uploadDataSet = async (baseDataSource, dataSet) => {
 const findDataSet = (dataSets, id) =>
   dataSets.find((d) => d.point[0].dataTypeName === id);
 
+const getSessions = async () => {
+  const endTime = new Date();
+  const startTime = subDays(endTime, 7);
+  const url = `https://www.googleapis.com/fitness/v1/users/me/sessions?startTime=${startTime.toISOString()}&endTime=${endTime.toISOString()}`;
+
+  const res = await fetch(url, {
+    method: "GET",
+    headers: buildHeaders(),
+  });
+
+  await handleErrors(res);
+
+  const json = await res.json();
+  return json.session;
+};
+
+const getDataSets = async (session) => {
+  // TODO Promise.all
+  const power = await getDataSet(POWER_DATA_SOURCE, session);
+  const heartRate = await getDataSet(HEART_RATE_DATA_SOURCE, session);
+  const cadence = await getDataSet(CADENCE_DATA_SOURCE, session);
+  const moveMinutes = await getDataSet(MOVE_MINUTES_DATA_SOURCE, session);
+  const heartPoints = await getDataSet(HEART_POINTS_DATA_SOURCE, session);
+  const calories = await getDataSet(CALORIES_DATA_SOURCE, session);
+
+  return {
+    session,
+    dataSets: { power, heartRate, cadence, moveMinutes, heartPoints, calories },
+  };
+};
+
+const getDataSet = async (baseDataSource, session) => {
+  const dataSource = await getDataSource(baseDataSource);
+  const startNs = session.startTimeMillis * 1000000;
+  const endNs = session.endTimeMillis * 1000000;
+
+  const url = `https://www.googleapis.com/fitness/v1/users/me/dataSources/${dataSource.dataStreamId}/datasets/${startNs}-${endNs}`;
+
+  const res = await fetch(url, {
+    method: "GET",
+    headers: buildHeaders(),
+  });
+
+  await handleErrors(res);
+
+  const json = await res.json();
+  return json;
+};
+
+export const nowNs = () =>
+  (window.performance.now() + window.performance.timeOrigin) * 1000000;
+
+export const getHistory = async () => {
+  const allSessions = await getSessions();
+
+  const sessions = allSessions
+    .filter((s) => s.application.name === APPLICATION.name)
+    .sort((a, b) => b.startTimeMillis - a.startTimeMillis);
+
+  const data = Promise.all(sessions.map((session) => getDataSets(session)));
+  return data;
+};
+
 export const uploadSession = async (dataSets) => {
   const powerData = findDataSet(dataSets, POWER);
   const heartRateData = findDataSet(dataSets, HEART_RATE);
@@ -169,6 +229,7 @@ export const uploadSession = async (dataSets) => {
   const heartPoints = findDataSet(dataSets, HEART_POINTS);
   const calories = findDataSet(dataSets, CALORIES);
 
+  // TODO promise.all?
   await uploadDataSet(POWER_DATA_SOURCE, powerData);
   await uploadDataSet(HEART_RATE_DATA_SOURCE, heartRateData);
   await uploadDataSet(CADENCE_DATA_SOURCE, cadenceData);
@@ -201,63 +262,4 @@ export const uploadSession = async (dataSets) => {
   await handleErrors(res);
 
   return res.ok;
-};
-
-export const getSessions = async () => {
-  const endTime = new Date();
-  const startTime = subDays(endTime, 7);
-  const url = `https://www.googleapis.com/fitness/v1/users/me/sessions?startTime=${startTime.toISOString()}&endTime=${endTime.toISOString()}`;
-
-  const res = await fetch(url, {
-    method: "GET",
-    headers: buildHeaders(),
-  });
-
-  await handleErrors(res);
-
-  const json = await res.json();
-  return json.session;
-};
-
-export const getHistory = async () => {
-  const allSessions = await getSessions();
-
-  const sessions = allSessions
-    .filter((s) => s.application.name === APPLICATION.name)
-    .sort((a, b) => b.startTimeMillis - a.startTimeMillis);
-
-  const data = Promise.all(sessions.map((session) => getDataSets(session)));
-  return data;
-};
-
-export const getDataSets = async (session) => {
-  const power = await getDataSet(POWER_DATA_SOURCE, session);
-  const heartRate = await getDataSet(HEART_RATE_DATA_SOURCE, session);
-  const cadence = await getDataSet(CADENCE_DATA_SOURCE, session);
-  const moveMinutes = await getDataSet(MOVE_MINUTES_DATA_SOURCE, session);
-  const heartPoints = await getDataSet(HEART_POINTS_DATA_SOURCE, session);
-  const calories = await getDataSet(CALORIES_DATA_SOURCE, session);
-
-  return {
-    session,
-    dataSets: { power, heartRate, cadence, moveMinutes, heartPoints, calories },
-  };
-};
-
-export const getDataSet = async (baseDataSource, session) => {
-  const dataSource = await getDataSource(baseDataSource);
-  const startNs = session.startTimeMillis * 1000000;
-  const endNs = session.endTimeMillis * 1000000;
-
-  const url = `https://www.googleapis.com/fitness/v1/users/me/dataSources/${dataSource.dataStreamId}/datasets/${startNs}-${endNs}`;
-
-  const res = await fetch(url, {
-    method: "GET",
-    headers: buildHeaders(),
-  });
-
-  await handleErrors(res);
-
-  const json = await res.json();
-  return json;
 };
