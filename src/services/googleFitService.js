@@ -175,13 +175,21 @@ const getSessions = async () => {
 };
 
 const getDataSets = async (session) => {
-  // TODO Promise.all
-  const power = await getDataSet(POWER_DATA_SOURCE, session);
-  const heartRate = await getDataSet(HEART_RATE_DATA_SOURCE, session);
-  const cadence = await getDataSet(CADENCE_DATA_SOURCE, session);
-  const moveMinutes = await getDataSet(MOVE_MINUTES_DATA_SOURCE, session);
-  const heartPoints = await getDataSet(HEART_POINTS_DATA_SOURCE, session);
-  const calories = await getDataSet(CALORIES_DATA_SOURCE, session);
+  const [
+    power,
+    heartRate,
+    cadence,
+    moveMinutes,
+    heartPoints,
+    calories,
+  ] = await Promise.all([
+    getDataSet(POWER_DATA_SOURCE, session),
+    getDataSet(HEART_RATE_DATA_SOURCE, session),
+    getDataSet(CADENCE_DATA_SOURCE, session),
+    getDataSet(MOVE_MINUTES_DATA_SOURCE, session),
+    getDataSet(HEART_POINTS_DATA_SOURCE, session),
+    getDataSet(CALORIES_DATA_SOURCE, session),
+  ]);
 
   return {
     session,
@@ -229,13 +237,14 @@ export const uploadSession = async (dataSets) => {
   const heartPoints = findDataSet(dataSets, HEART_POINTS);
   const calories = findDataSet(dataSets, CALORIES);
 
-  // TODO promise.all?
-  await uploadDataSet(POWER_DATA_SOURCE, powerData);
-  await uploadDataSet(HEART_RATE_DATA_SOURCE, heartRateData);
-  await uploadDataSet(CADENCE_DATA_SOURCE, cadenceData);
-  await uploadDataSet(MOVE_MINUTES_DATA_SOURCE, moveMinutes);
-  await uploadDataSet(HEART_POINTS_DATA_SOURCE, heartPoints);
-  await uploadDataSet(CALORIES_DATA_SOURCE, calories);
+  await Promise.all([
+    uploadDataSet(POWER_DATA_SOURCE, powerData),
+    uploadDataSet(HEART_RATE_DATA_SOURCE, heartRateData),
+    uploadDataSet(CADENCE_DATA_SOURCE, cadenceData),
+    uploadDataSet(MOVE_MINUTES_DATA_SOURCE, moveMinutes),
+    uploadDataSet(HEART_POINTS_DATA_SOURCE, heartPoints),
+    uploadDataSet(CALORIES_DATA_SOURCE, calories),
+  ]);
 
   const startTimeMillis = Math.round(powerData.minStartTimeNs / 1000000);
   const endTimeMillis = Math.round(powerData.maxEndTimeNs / 1000000);
