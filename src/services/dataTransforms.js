@@ -29,7 +29,7 @@ const getMoveMinutes = (d) => {
     return 0;
   }
 
-  const ms = Math.round((d.endTimeNanos - d.startTimeNanos) / 60000000000);
+  const ms = Math.round((d.endTimeNanos - d.startTimeNanos) / 1000000);
 
   return ms;
 };
@@ -219,7 +219,7 @@ export const toDisplay = (sessions) => {
     const averagePower = Math.round(average(power));
     const averageHeartRate = Math.round(average(heartRate));
     const averageCadence = Math.round(average(cadence));
-    const totalMoveMinutes = Math.round(sum(moveMinutes));
+    const totalMoveMinutes = Math.round(sum(moveMinutes) / 60000);
     const totalHeartPoints = Math.round(sum(heartPoints));
     const totalCalories = Math.round(sum(calories));
 
