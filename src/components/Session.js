@@ -1,4 +1,5 @@
 import React from "react";
+import format from "date-fns/format";
 import { MultiChart } from "./MultiChart";
 import "./Session.css";
 
@@ -9,35 +10,41 @@ const Emoji = ({ symbol }) => (
 );
 
 export const Session = ({ session }) => {
+  const day = format(session.startTime, "EEEE");
+  const dateAndTime = format(session.startTime, "MMMM d 'at' h:mm aaaa");
+
   const heartRateChartData = session.heartRate.filter((_d, i) => i % 10 === 0);
   const powerChartData = session.power.filter((_d, i) => i % 10 === 0);
   const cadenceChartData = session.cadence.filter((_d, i) => i % 10 === 0);
 
   return (
     <div className="session">
-      <h2>{session.startTime}</h2>
+      <div className="session-header-container">
+        <h2 className="session-header">{day}</h2>
+        <h3 className="session-subheader label">{dateAndTime}</h3>
+      </div>
 
       <div className="stats">
         <div className="totals">
           <div className="total">
+            <Emoji symbol="⏰" />
+            {session.length}
+            <span className="label"> min</span>
+          </div>
+
+          <div className="total">
             <Emoji symbol="🔥" />
             {session.totalCalories}
-            <span className="label"> kcal</span>
+            <span className="label"> cal</span>
           </div>
 
           <div className="total">
-            <Emoji symbol="⏰" />
-            {session.totalMoveMinutes}
-            <span className="label"> minutes</span>
+            <Emoji symbol="😅" />️{session.totalHeartPoints}
+            <span className="label"> heart pts</span>
           </div>
 
           <div className="total">
-            <Emoji symbol="❤" />️{session.totalHeartPoints}
-            <span className="label"> points</span>
-          </div>
-
-          <div className="total">
-            <Emoji symbol="💓️" />
+            <Emoji symbol="❤️" />
             {session.averageHeartRate}
             <span className="label"> avg bpm</span>
           </div>

@@ -3,8 +3,23 @@
   margin: 2rem;
 }
 
-.session h2 {
+.session-header-container {
+  display: flex;
+  border-bottom: 0.2rem solid #75787d;
+  align-items: flex-end;
   margin-bottom: 1rem;
+}
+
+.session-header {
+  margin: 0;
+}
+
+.session-subheader {
+  margin: 0;
+  margin-bottom: 0.1rem;
+  font-size: 1rem;
+  text-align: right;
+  flex-grow: 1;
 }
 
 .totals {
@@ -22,7 +37,6 @@
 }
 
 .chart {
-  margin-right: 2rem;
   margin-top: 0.25rem;
 }
 
@@ -32,6 +46,9 @@
 
 .emoji {
   margin-right: 0.25rem;
+  font-size: 0.85rem;
+  display: inline-block;
+  width: 1.2rem;
 }
 
 .stats {

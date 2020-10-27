@@ -1,5 +1,4 @@
 import differenceInMinutes from "date-fns/differenceInMinutes";
-import format from "date-fns/format";
 import {
   CADENCE,
   CALORIES,
@@ -231,11 +230,11 @@ export const toDisplay = (sessions) => {
       heartRate,
       length,
       power,
-      totalMoveMinutes,
-      totalHeartPoints,
+      startTime,
       totalCalories,
+      totalHeartPoints,
+      totalMoveMinutes,
       name: session.session.name,
-      startTime: format(startTime, "EEE, MMM d 'at' h:mm aaaa"),
     };
   });
 };
