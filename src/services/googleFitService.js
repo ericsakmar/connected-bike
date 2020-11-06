@@ -229,12 +229,12 @@ export const getHistory = async () => {
   return data;
 };
 
+// TODO consider making `dataSets` an object instead of an array
 export const uploadSession = async (dataSets) => {
   const powerData = findDataSet(dataSets, POWER);
   const heartRateData = findDataSet(dataSets, HEART_RATE);
   const cadenceData = findDataSet(dataSets, CADENCE);
-  // let's see what happens without move minutes
-  // const moveMinutes = findDataSet(dataSets, MOVE_MINUTES);
+  const moveMinutes = findDataSet(dataSets, MOVE_MINUTES);
   const heartPoints = findDataSet(dataSets, HEART_POINTS);
   const calories = findDataSet(dataSets, CALORIES);
 
@@ -242,7 +242,7 @@ export const uploadSession = async (dataSets) => {
     uploadDataSet(POWER_DATA_SOURCE, powerData),
     uploadDataSet(HEART_RATE_DATA_SOURCE, heartRateData),
     uploadDataSet(CADENCE_DATA_SOURCE, cadenceData),
-    // uploadDataSet(MOVE_MINUTES_DATA_SOURCE, moveMinutes),
+    uploadDataSet(MOVE_MINUTES_DATA_SOURCE, moveMinutes),
     uploadDataSet(HEART_POINTS_DATA_SOURCE, heartPoints),
     uploadDataSet(CALORIES_DATA_SOURCE, calories),
   ]);

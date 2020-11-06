@@ -8,6 +8,10 @@ import {
   POWER,
 } from "./googleFitService";
 
+const nsToMinutes = (ns) => ns / 60000000000;
+const minutesToNs = (minutes) => minutes * 60000000000;
+const roundNsToNearestMinute = (ns) => minutesToNs(Math.round(nsToMinutes(ns)));
+
 const getCalories = (d) => {
   // https://gearandgrit.com/convert-watts-calories-burned-cycling/
   const hours = (d.endTimeNanos - d.startTimeNanos) / 3600000000000;
@@ -129,6 +133,28 @@ export const toDataSetPoints = (d) => [
   },
 ];
 
+export const rollUp = (acc, d) => {
+  const accVal = acc.value[0];
+  const dVal = d.value[0];
+  const value =
+    accVal.fpVal === undefined
+      ? [{ intVal: accVal.intVal + dVal.intVal }]
+      : [{ fpVal: accVal.fpVal + dVal.fpVal }];
+
+  return {
+    ...acc,
+    value,
+    endTimeNanos: d.endTimeNanos,
+  };
+};
+
+export const roundTimestamps = (d) => ({
+  ...d,
+  startTimeNanos: roundNsToNearestMinute(d.startTimeNanos),
+  endTimeNanos: roundNsToNearestMinute(d.endTimeNanos),
+});
+
+// TODO consider making `points` an object instead of an array
 export const toDataSets = (points) => {
   const power = points.find((p) => p[0].dataTypeName === POWER);
   const heartRate = points.find((p) => p[0].dataTypeName === HEART_RATE);

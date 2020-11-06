@@ -4,6 +4,7 @@ import {
   map,
   mergeMap,
   pairwise,
+  reduce,
   takeWhile,
   throttleTime,
   toArray,
@@ -13,8 +14,18 @@ import Dashboard from "./Dashboard";
 import { BluethoothIcon, PlayIcon, StopIcon } from "./Icons";
 import "./App.css";
 import { AccountControls } from "./components/AccountControls";
-import { nowNs, uploadSession } from "./services/googleFitService";
-import { toDataSetPoints, toDataSets } from "./services/dataTransforms";
+import {
+  HEART_POINTS,
+  MOVE_MINUTES,
+  nowNs,
+  uploadSession,
+} from "./services/googleFitService";
+import {
+  rollUp,
+  roundTimestamps,
+  toDataSetPoints,
+  toDataSets,
+} from "./services/dataTransforms";
 import { History } from "./components/History";
 
 const DISCONNECTED = "disconnected";
@@ -42,6 +53,10 @@ function App() {
     // TODO some kind of error handling?
     setMessage("Uploading...");
     await uploadSession(dataSets);
+
+    console.log("FINAL");
+    console.log(dataSets);
+
     setMessage("Upload complete!");
   };
 
@@ -60,10 +75,22 @@ function App() {
           return { ...p, endTimeNanos: p.startTimeNanos + timeDiff };
         }),
         mergeMap((d) => toDataSetPoints(d)),
+
+        // OR MAYBE WINDOW???
         takeWhile(() => isRecording.current),
-        // TODO maybe filter out zeroes here??
+
         groupBy((d) => d.dataTypeName),
-        mergeMap((d) => d.pipe(toArray())),
+        mergeMap((group$) => {
+          if (group$.key === MOVE_MINUTES || group$.key === HEART_POINTS) {
+            return group$.pipe(
+              reduce(rollUp),
+              map((d) => roundTimestamps(d)),
+              map((d) => [d])
+            );
+          }
+
+          return group$.pipe(toArray());
+        }),
         toArray(),
         map((points) => toDataSets(points))
       )
