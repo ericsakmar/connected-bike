@@ -84,6 +84,20 @@ function App() {
           if (group$.key === MOVE_MINUTES || group$.key === HEART_POINTS) {
             return group$.pipe(
               reduce(rollUp),
+              map((d) => {
+                if (d.dataTypeName === MOVE_MINUTES) {
+                  // we have ms, but api wants minutes
+                  // TODO there's probably a better way to handle these special cases
+                  const ms = d.value[0].intVal;
+                  const min = Math.round(ms / 60000);
+                  return {
+                    ...d,
+                    value: [{ intVal: min }],
+                  };
+                }
+
+                return d;
+              }),
               map((d) => roundTimestamps(d)),
               map((d) => [d])
             );
