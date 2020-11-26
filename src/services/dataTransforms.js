@@ -163,49 +163,49 @@ export const toDataSets = (points) => {
   const heartPoints = points.find((p) => p[0].dataTypeName === HEART_POINTS);
   const calories = points.find((p) => p[0].dataTypeName === CALORIES);
 
-  const minStartTimeNs = power[0].startTimeNanos;
-  const maxEndTimeNs = power[power.length - 1].endTimeNanos;
+  // const minStartTimeNs = power[0].startTimeNanos;
+  // const maxEndTimeNs = power[power.length - 1].endTimeNanos;
 
   return [
     {
       dataSourceId: "TODO",
-      maxEndTimeNs,
-      minStartTimeNs,
+      minStartTimeNs: power[0].startTimeNanos,
+      maxEndTimeNs: power[power.length - 1].endTimeNanos,
       point: power,
     },
 
     {
       dataSourceId: "TODO",
-      maxEndTimeNs,
-      minStartTimeNs,
+      minStartTimeNs: heartRate[0].startTimeNanos,
+      maxEndTimeNs: heartRate[heartRate.length - 1].endTimeNanos,
       point: heartRate,
     },
 
     {
       dataSourceId: "TODO",
-      maxEndTimeNs,
-      minStartTimeNs,
+      minStartTimeNs: cadence[0].startTimeNanos,
+      maxEndTimeNs: cadence[cadence.length - 1].endTimeNanos,
       point: cadence,
     },
 
     {
       dataSourceId: "TODO",
-      maxEndTimeNs,
-      minStartTimeNs,
+      minStartTimeNs: moveMinutes[0].startTimeNanos,
+      maxEndTimeNs: moveMinutes[moveMinutes.length - 1].endTimeNanos,
       point: moveMinutes,
     },
 
     {
       dataSourceId: "TODO",
-      maxEndTimeNs,
-      minStartTimeNs,
+      minStartTimeNs: heartPoints[0].startTimeNanos,
+      maxEndTimeNs: heartPoints[heartPoints.length - 1].endTimeNanos,
       point: heartPoints,
     },
 
     {
       dataSourceId: "TODO",
-      maxEndTimeNs,
-      minStartTimeNs,
+      minStartTimeNs: calories[0].startTimeNanos,
+      maxEndTimeNs: calories[calories.length - 1].endTimeNanos,
       point: calories,
     },
   ];
