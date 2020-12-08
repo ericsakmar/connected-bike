@@ -22,14 +22,14 @@ export const AccountControls = ({ onUserLoaded }) => {
   const handleLogin = (response) => {
     setUserCookie({
       ...response.profileObj,
-      accessToken: response.wc.access_token,
+      accessToken: response.xc.access_token,
     });
 
-    if (response.wc.access_token) {
+    if (response.xc.access_token) {
       onUserLoaded({
         ...response.profileObj,
         haslogin: true,
-        accessToken: response.wc.access_token,
+        accessToken: response.xc.access_token,
       });
       setLoggedIn(true);
     }
